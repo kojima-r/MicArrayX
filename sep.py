@@ -11,7 +11,7 @@ import numpy as np
 import numpy.random as npr
 import math
 from optparse import OptionParser
-from . import simmch
+import simmch
 
 
 def zcc(x):

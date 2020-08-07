@@ -61,6 +61,7 @@ def apply_window(x, win, step):
     l = len(x)
     N = len(win)
     M = int(ceil(float(l - N + step) / step))
+    step=int(step)
 
     new_x = zeros(N + ((M - 1) * step), dtype=float64)
     new_x[:l] = x  # zero padding
