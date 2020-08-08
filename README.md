@@ -124,7 +124,7 @@ command outputs  `./sample/jinsei_noise_mix.wav`, a mixture of `./sample/jinsei_
 - `micarrayx-sim-td` synthesizes a multi-channel sound from time difference without transfer function.
 - `micarrayx/check_parseval.py` makes sure the Parseval equation holds (for checking FFT).
 
-##　Creating simulation data（under construction） 
+## Creating simulation data（under construction） 
 ```
 ./make_sim_wav.sh ./i1.wav ./i2.wav ./o1.wav ./o2.wav
 ```
