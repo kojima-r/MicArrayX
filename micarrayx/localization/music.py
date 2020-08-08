@@ -15,7 +15,7 @@ sns.set()
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
-import simmch
+import micarrayx
 from hark_tf.read_mat import read_hark_tf
 from hark_tf.read_param import read_hark_tf_param
 
@@ -207,7 +207,7 @@ def compute_music_power(
     setting = {}
     # read wav
     print("... reading", wav_filename)
-    wav_data = simmch.read_mch_wave(wav_filename)
+    wav_data = micarrayx.read_mch_wave(wav_filename)
     wav = wav_data["wav"] / normalize_factor
     fs = wav_data["framerate"]
     # print info
@@ -236,7 +236,7 @@ def compute_music_power(
 
     # apply STFT
     win = hamming(fftLen)  # ハミング窓
-    spec = simmch.stft_mch(wav, win, stft_step)
+    spec = micarrayx.stft_mch(wav, win, stft_step)
     spec_m = spec[:, :, min_freq_bin:max_freq_bin]
     # apply MUSIC method
     ## power[frame, freq, direction_id]
@@ -259,7 +259,7 @@ def compute_music_power(
     return spec, m_power, m_full_power, setting
 
 
-if __name__ == "__main__":
+def main():
     # argv check
     parser = argparse.ArgumentParser(
         description="applying the MUSIC method to am-ch wave file"
@@ -422,3 +422,5 @@ if __name__ == "__main__":
     # plot spectrogram
     if args.out_spectrogram:
         save_spectrogram(args.out_spectrogram, spec, ch=0)
+if __name__ == "__main__":
+    main()

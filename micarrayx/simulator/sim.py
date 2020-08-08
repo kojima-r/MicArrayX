@@ -15,7 +15,7 @@ from .simmch import nearest_direction_index
 
 from optparse import OptionParser
 
-if __name__ == "__main__":
+def main():
     usage = "usage: %s tf [options] <in: src.wav> <out: dest.wav>" % sys.argv[0]
     parser = OptionParser()
     parser.add_option(
@@ -124,3 +124,6 @@ if __name__ == "__main__":
     ww.setnframes(out_wavdata.shape[0])
     ww.writeframes(array.array("h", out_wavdata.astype("int16").ravel()).tostring())
     ww.close()
+
+if __name__ == "__main__":
+    main()

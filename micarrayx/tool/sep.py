@@ -21,8 +21,7 @@ def zcc(x):
             counter += 1
     return counter
 
-
-if __name__ == "__main__":
+def main():
     usage = "usage: %s [options] <in: src.wav>" % sys.argv[0]
     parser = OptionParser()
     parser.add_option(
@@ -206,3 +205,5 @@ if __name__ == "__main__":
         plt.savefig(options.plot_output, dpi=72)
     except:
         print("[WARN] too short (plot fail)")
+if __name__ == "__main__":
+    main()

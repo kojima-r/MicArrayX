@@ -9,11 +9,11 @@ import numpy as np
 import numpy.random as npr
 import math
 
-import simmch
+import micarrayx
 from hark_tf.read_mat import read_hark_tf
 from hark_tf.read_param import read_hark_tf_param
-import wiener_filter
-from filter_aux import (
+from micarrayx.filter import wiener
+from micarrayx.filter.filter_aux import (
     estimate_self_correlation,
     get_beam_vec,
     save_sidelobe,
@@ -26,7 +26,7 @@ def get_blocking_mat(n):
     return x
 
 
-if __name__ == "__main__":
+def main():
     # argv check
     if len(sys.argv) < 2:
         print(
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     tf_filename = sys.argv[1]
     tf_config = read_hark_tf(tf_filename)
     src_theta = 0 / 180.0 * math.pi
-    src_index = simmch.nearest_direction_index(tf_config, src_theta)
+    src_index = micarrayx.nearest_direction_index(tf_config, src_theta)
     if not src_index in tf_config["tf"]:
         print(
             "Error: tf index", src_index, "does not exist in TF file", file=sys.stderr
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     ###
     wav_filename1 = sys.argv[2]
     print("... reading", wav_filename1)
-    wav_data1 = simmch.read_mch_wave(wav_filename1)
+    wav_data1 = micarrayx.read_mch_wave(wav_filename1)
     wav1 = wav_data1["wav"] / 32767.0
     fs1 = wav_data1["framerate"]
     nch1 = wav_data1["nchannels"]
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     #
     win = hamming(fftLen)  # ハミング窓
-    spec1 = simmch.stft_mch(wav1, win, step)
+    spec1 = micarrayx.stft_mch(wav1, win, step)
     # spec1[ch, frame, freq_bin]
     nch = spec1.shape[0]
     nframe = spec1.shape[1]
@@ -102,8 +102,8 @@ if __name__ == "__main__":
             )
     ds_freq = np.array([ds_freq])
     ### GSC for DS beamformer
-    w_a, _, _ = wiener_filter.wiener_filter_freq(blocked_freq, ds_freq)
-    y_ds = wiener_filter.apply_filter_freq(blocked_freq, w_a)
+    w_a, _, _ = wiener.wiener_filter_freq(blocked_freq, ds_freq)
+    y_ds = wiener.apply_filter_freq(blocked_freq, w_a)
     save_sidelobe("sidelobe_ds.png", tf_config, a_vec, sidelobe_freq_bin)
     w_gsc_ds = np.zeros((nfreq_bin, nch), dtype=complex)
     for freq_bin in range(nfreq_bin):
@@ -127,12 +127,12 @@ if __name__ == "__main__":
         w_mv[freq_bin, :] = np.squeeze(
             rz_inv.dot(av).dot(np.linalg.inv(av.conj().T.dot(rz_inv).dot(av)))
         )
-    mv_freq = wiener_filter.apply_filter_freq(spec1, w_mv)
+    mv_freq = wiener.apply_filter_freq(spec1, w_mv)
     # mv_freq=np.array([mv_freq])
     save_sidelobe("sidelobe_mv.png", tf_config, w_mv, sidelobe_freq_bin)
     ### GSC for MV beamformer
-    w_a, _, _ = wiener_filter.wiener_filter_freq(blocked_freq, mv_freq)
-    y_mv = wiener_filter.apply_filter_freq(blocked_freq, w_a)
+    w_a, _, _ = wiener.wiener_filter_freq(blocked_freq, mv_freq)
+    y_mv = wiener.apply_filter_freq(blocked_freq, w_a)
     w_gsc_mv = np.zeros((nfreq_bin, nch), dtype=complex)
     for freq_bin in range(nfreq_bin):
         w_gsc_mv[freq_bin, :] = w_mv[freq_bin, :] - w_a[freq_bin, :].dot(
@@ -144,19 +144,22 @@ if __name__ == "__main__":
     ###
     out_gsc_ds = ds_freq - y_ds
     out_gsc_mv = mv_freq - y_mv
-    recons_out_gsc_ds = simmch.istft_mch(out_gsc_ds, win, step)
-    recons_out_gsc_mv = simmch.istft_mch(out_gsc_mv, win, step)
-    recons_ds_y = simmch.istft_mch(y_ds, win, step)
-    recons_mv_y = simmch.istft_mch(y_mv, win, step)
-    recons_b = simmch.istft_mch(blocked_freq, win, step)
-    recons_ds = simmch.istft_mch(ds_freq, win, step)
-    recons_mv = simmch.istft_mch(mv_freq, win, step)
-    simmch.save_mch_wave(recons_mv * 32767.0, "mv.wav")
-    simmch.save_mch_wave(recons_ds * 32767.0, "ds.wav")
-    simmch.save_mch_wave(recons_ds_y * 32767.0, "y_ds.wav")
-    simmch.save_mch_wave(recons_mv_y * 32767.0, "y_mv.wav")
-    simmch.save_mch_wave(recons_out_gsc_ds * 32767.0, "gsc_ds.wav")
-    simmch.save_mch_wave(recons_out_gsc_mv * 32767.0, "gsc_mv.wav")
-    simmch.save_mch_wave(recons_b * 32767.0, "b.wav")
+    recons_out_gsc_ds = micarrayx.istft_mch(out_gsc_ds, win, step)
+    recons_out_gsc_mv = micarrayx.istft_mch(out_gsc_mv, win, step)
+    recons_ds_y = micarrayx.istft_mch(y_ds, win, step)
+    recons_mv_y = micarrayx.istft_mch(y_mv, win, step)
+    recons_b = micarrayx.istft_mch(blocked_freq, win, step)
+    recons_ds = micarrayx.istft_mch(ds_freq, win, step)
+    recons_mv = micarrayx.istft_mch(mv_freq, win, step)
+    micarrayx.save_mch_wave(recons_mv * 32767.0, "mv.wav")
+    micarrayx.save_mch_wave(recons_ds * 32767.0, "ds.wav")
+    micarrayx.save_mch_wave(recons_ds_y * 32767.0, "y_ds.wav")
+    micarrayx.save_mch_wave(recons_mv_y * 32767.0, "y_mv.wav")
+    micarrayx.save_mch_wave(recons_out_gsc_ds * 32767.0, "gsc_ds.wav")
+    micarrayx.save_mch_wave(recons_out_gsc_mv * 32767.0, "gsc_mv.wav")
+    micarrayx.save_mch_wave(recons_b * 32767.0, "b.wav")
 
     quit()
+
+if __name__ == "__main__":
+    main()

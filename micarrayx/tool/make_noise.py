@@ -9,12 +9,12 @@ import numpy as np
 import numpy.random as npr
 import math
 
-import simmch
+import micarrayx
 
 from hark_tf.read_mat import read_hark_tf
 from hark_tf.read_param import read_hark_tf_param
-from sim_tf import apply_tf
-from simmch import nearest_direction_index
+from micarrayx.simulator.sim_tf import apply_tf
+from micarrayx import nearest_direction_index
 
 from optparse import OptionParser
 
@@ -36,7 +36,7 @@ def make_white_noise_freq(nch, length, fftLen, step):
     out_data = []
     for mic_index in range(data.shape[0]):
         spec = data[mic_index]
-        full_spec = simmch.make_full_spectrogram(spec)
+        full_spec = micarrayx.make_full_spectrogram(spec)
         # s_sum=np.mean(np.abs(full_spec)**2,axis=1)
         # print "[CHECK] power(spec/frame):",np.mean(s_sum)
         out_data.append(full_spec)
@@ -56,8 +56,8 @@ def make_white_noise(nch, length, fftLen, step):
     for mic_index in range(data.shape[0]):
         spec = data[mic_index]
         ### iSTFT
-        resyn_data = simmch.istft(spec, win, step)
-        # x=simmch.apply_window(resyn_data, win, step)
+        resyn_data = micarrayx.istft(spec, win, step)
+        # x=micarrayx.apply_window(resyn_data, win, step)
         # w_sum=np.sum(x**2,axis=1)
         # print "[CHECK] power(x/frame):",np.mean(w_sum)
         out_wavdata.append(resyn_data)
@@ -67,7 +67,7 @@ def make_white_noise(nch, length, fftLen, step):
     return mch_wavdata / amp
 
 
-if __name__ == "__main__":
+def main():
     usage = "usage: %s [options] <out: dest.wav>" % sys.argv[0]
     parser = OptionParser(usage)
     parser.add_option(
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     elif options.template != None:
         wav_filename = options.template
         print("... reading", wav_filename)
-        wav_data = simmch.read_mch_wave(wav_filename)
+        wav_data = micarrayx.read_mch_wave(wav_filename)
         nsamples = wav_data["nframes"]
         nch = wav_data["nchannels"]
         length = ((nsamples - (fftLen - step)) - 1) / step + 1
@@ -196,6 +196,9 @@ if __name__ == "__main__":
     g = 32767.0 * options.amp
     print("[INFO] gain:", g)
     mch_wavdata = mch_wavdata * g
-    simmch.save_mch_wave(
+    micarrayx.save_mch_wave(
         mch_wavdata, output_filename, sample_width=2, framerate=options.samplingrate
     )
+
+if __name__ == "__main__":
+    main()

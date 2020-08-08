@@ -97,7 +97,7 @@ def delaytime2sample(mic_delay, samplingrate):
     return res
 
 
-if __name__ == "__main__":
+def main():
     # argv check
     if len(sys.argv) < 4:
         print(
@@ -172,5 +172,8 @@ if __name__ == "__main__":
     ww.setparams(wr.getparams())
     ww.setnchannels(out_wavdata.shape[1])
     ww.setnframes(out_wavdata.shape[0])
-    ww.writeframes(array.array("h", out_wavdata.astype("int16").ravel()).tostring())
+    ww.writeframes(array.array("h", out_wavdata.astype("int16").ravel()).tobytes())
     ww.close()
+
+if __name__ == "__main__":
+    main()

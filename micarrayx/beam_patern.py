@@ -15,7 +15,7 @@ from sim_tf import apply_tf
 
 from optparse import OptionParser
 
-if __name__ == "__main__":
+def main():
     usage = "usage: %s tf [options] <in: src.wav> <out: dest.wav>" % sys.argv[0]
     parser = OptionParser()
     parser.add_option(
@@ -111,3 +111,6 @@ if __name__ == "__main__":
     mch_wavdata = apply_tf(data, fftLen, step, tf_config, src_index, noise_amp=1)
     mch_wavdata = mch_wavdata * src_volume
     print(mch_wavdata.shape)
+
+if __name__ == "__main__":
+    main()

@@ -3,7 +3,7 @@ import sys
 from optparse import OptionParser
 
 
-if __name__ == "__main__":
+def main():
     usage = "usage: %s tf [options] <in: src.wav> <out: dest.wav>" % sys.argv[0]
     parser = OptionParser()
     parser.add_option(
@@ -77,3 +77,6 @@ if __name__ == "__main__":
     i_file.close()
 
     subprocess.call(["batchflow", options.script, f])
+
+if __name__ == "__main__":
+    main()

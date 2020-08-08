@@ -11,7 +11,7 @@ import numpy as np
 import numpy.random as npr
 import math
 
-import simmch
+import micarrayx
 from hark_tf.read_mat import read_hark_tf
 from hark_tf.read_param import read_hark_tf_param
 
@@ -28,7 +28,7 @@ def make_noise(x):
 def apply_tf_spec(data, fftLen, step, tf_config, src_index, noise_amp=0):
     win = hamming(fftLen)  # ハミング窓
     ### STFT
-    spectrogram = simmch.stft(data, win, step)
+    spectrogram = micarrayx.stft(data, win, step)
     spec = spectrogram[:, : int(fftLen / 2 + 1)]
     # spec = [4,3,2,1,2*,3*]
     ### Apply TF
@@ -61,14 +61,14 @@ def apply_tf(data, fftLen, step, tf_config, src_index, noise_amp=0):
     for mic_index in range(mch_data.shape[0]):
         spec = mch_data[mic_index]
         ### iSTFT
-        resyn_data = simmch.istft(spec, win, step)
+        resyn_data = micarrayx.istft(spec, win, step)
         out_wavdata.append(resyn_data)
     # concat waves
     mch_wavdata = np.vstack(out_wavdata)
     return mch_wavdata
 
 
-if __name__ == "__main__":
+def main():
     # argv check
     if len(sys.argv) < 5:
         print(
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     print("... reading", tf_filename)
     tf_config = read_hark_tf(tf_filename)
     mic_pos = read_hark_tf_param(tf_filename)
-    src_index = simmch.nearest_direction_index(tf_config, src_theta)
+    src_index = micarrayx.nearest_direction_index(tf_config, src_theta)
     print("# mic positions  :", mic_pos)
     print("# direction index:", src_index)
     if not src_index in tf_config["tf"]:
@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
     ## read wav file
     print("... reading", wav_filename)
-    wav_data = simmch.read_mch_wave(wav_filename)
+    wav_data = micarrayx.read_mch_wave(wav_filename)
     scale = 32767.0
     wav = wav_data["wav"] / scale
     fs = wav_data["framerate"]
@@ -120,4 +120,7 @@ if __name__ == "__main__":
     mch_wavdata = mch_wavdata / a
     mch_wavdata = mch_wavdata * scale * src_volume
     ## save data
-    simmch.save_mch_wave(mch_wavdata, output_filename)
+    micarrayx.save_mch_wave(mch_wavdata, output_filename)
+
+if __name__ == "__main__":
+    main()

@@ -19,16 +19,16 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import json
 
-from . import simmch
-from HARK_TF_Parser.read_mat import read_hark_tf
-from HARK_TF_Parser.read_param import read_hark_tf_param
-from HARK_TF_Parser.sorting_mat import permutation_hark_tf
+import micarrayx
+from hark_tf import read_hark_tf
+from hark_tf import read_hark_tf_param
+from hark_tf import permutation_hark_tf
 
-from . import music
+from micarryx import music
 
 from optparse import OptionParser
 
-if __name__ == "__main__":
+def main():
     usage = "usage: %s tf [options] <in: src.wav> <out: dest.wav>" % sys.argv[0]
     parser = OptionParser()
 
@@ -243,3 +243,6 @@ if __name__ == "__main__":
         sns.plt.savefig(outfilename_heat_bar, bbox_inches="tight", pad_inches=0.0)
         sns.plt.clf()
         print("[save]", outfilename_heat_bar, m_power.shape)
+
+if __name__ == "__main__":
+    main()

@@ -7,9 +7,9 @@ import numpy as np
 import numpy.random as npr
 import math
 from optparse import OptionParser
-from . import simmch
+import simmch
 
-if __name__ == "__main__":
+def main():
     usage = "usage: %s tf [options] <in: src.wav>" % sys.argv[0]
     parser = OptionParser()
     parser.add_option(
@@ -57,3 +57,6 @@ if __name__ == "__main__":
     # save data
     if output_filename != None:
         simmch.save_mch_wave(wav, output_filename)
+
+if __name__ == "__main__":
+    main()

@@ -19,11 +19,11 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 from optparse import OptionParser
-import simmch
+import micarrayx
 from hark_tf.read_mat import read_hark_tf
 from hark_tf.read_param import read_hark_tf_param
 
-from filter_aux import estimate_correlation, estimate_self_correlation, save_sidelobe
+from micarrayx.filter.filter_aux import estimate_correlation, estimate_self_correlation, save_sidelobe
 
 
 def apply_filter_freq(spec1, w):
@@ -129,7 +129,7 @@ def apply_filter_eigen(spec1, w):
     return out_spec
 
 
-if __name__ == "__main__":
+def main():
     parser = OptionParser()
     parser.add_option(
         "-t",
@@ -155,7 +155,7 @@ if __name__ == "__main__":
     # read wav (src)
     wav_filename1 = args[0]
     print("... reading", wav_filename1)
-    wav_data1 = simmch.read_mch_wave(wav_filename1)
+    wav_data1 = micarrayx.read_mch_wave(wav_filename1)
     wav1 = wav_data1["wav"] / 32767.0
     fs1 = wav_data1["framerate"]
     nch1 = wav_data1["nchannels"]
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     wav_data_list = []
     for wav_filename2 in args[1:]:
         print("... reading", wav_filename2)
-        wav_data2 = simmch.read_mch_wave(wav_filename2)
+        wav_data2 = micarrayx.read_mch_wave(wav_filename2)
         wav2 = wav_data2["wav"] / 32767.0
         fs2 = wav_data2["framerate"]
         nch2 = wav_data2["nchannels"]
@@ -198,8 +198,8 @@ if __name__ == "__main__":
 
     # STFT
     win = hamming(fftLen)  # ハミング窓
-    spec1 = simmch.stft_mch(wav1, win, step)
-    spec2 = simmch.stft_mch(wav2, win, step)
+    spec1 = micarrayx.stft_mch(wav1, win, step)
+    spec2 = micarrayx.stft_mch(wav2, win, step)
     ##
     ##
     nframe1 = spec1.shape[1]
@@ -213,8 +213,8 @@ if __name__ == "__main__":
         print("# filter:", w.shape)
         out_spec = apply_filter_eigen(spec1_temp, w)
         # ISTFT
-        recons = simmch.istft_mch(out_spec, win, step)
-        simmch.save_mch_wave(recons * 32767.0, "recons_eigen.wav")
+        recons = micarrayx.istft_mch(out_spec, win, step)
+        micarrayx.save_mch_wave(recons * 32767.0, "recons_eigen.wav")
         quit()
     # print spec1_temp.shape
     # print spec2_temp.shape
@@ -238,7 +238,10 @@ if __name__ == "__main__":
     # filter
     out_spec = apply_filter_freq(spec1_temp, w)
     # ISTFT
-    recons = simmch.istft_mch(out_spec, win, step)
+    recons = micarrayx.istft_mch(out_spec, win, step)
 
     # recons.reshape((recons.shape[0],1))
-    simmch.save_mch_wave(recons * 32767.0, "recons_wiener.wav")
+    micarrayx.save_mch_wave(recons * 32767.0, "recons_wiener.wav")
+
+if __name__ == "__main__":
+    main()

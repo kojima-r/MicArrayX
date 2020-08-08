@@ -16,8 +16,8 @@ import matplotlib.cm as cm
 
 from hark_tf.read_mat import read_hark_tf
 from hark_tf.read_param import read_hark_tf_param
-import simmch
-import music
+import micarrayx
+from micarrayx.localization import music
 
 
 def detect_island(vec):
@@ -66,8 +66,7 @@ def detect_peak(vec):
     return peaks
 
 
-if __name__ == "__main__":
-
+def main():
     # argv check
     parser = argparse.ArgumentParser(
         description="applying the MUSIC method to am-ch wave file"
@@ -363,3 +362,6 @@ if __name__ == "__main__":
         print("[save]", filename)
         with open(filename, "w") as f:
             json.dump(save_obj, f)
+
+if __name__ == "__main__":
+    main()
