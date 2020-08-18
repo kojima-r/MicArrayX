@@ -15,7 +15,9 @@ setuptools.setup(
     entry_points={
         "console_scripts": [
             "micarrayx-make-noise= micarrayx.tool.make_noise:main",
+            "micarrayx-add-noise= micarrayx.tool.add_noise:main",
             "micarrayx-normalize= micarrayx.tool.normalize:main",
+            "micarrayx-experiment= micarrayx.tool.experiment_sim00:main",
             "micarrayx-mix= micarrayx.tool.mix:main",
             "micarrayx-sep= micarrayx.tool.sep:main",
             "micarrayx-sim= micarrayx.simulator.sim:main",
