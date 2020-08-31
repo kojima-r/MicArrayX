@@ -320,7 +320,7 @@ def main():
     for t in range(spec1.shape[1]):
         for freq_bin in range(spec1.shape[2]):
             ds_freq[t, freq_bin] = (
-                np.dot(a_vec[freq_bin, :], spec1[:, t, freq_bin]) / nch
+                np.dot(a_vec.conj()[freq_bin, :], spec1[:, t, freq_bin]) / nch
             )
     ds_freq = np.array([ds_freq])
     win = np.hamming(fftLen)  # ハミング窓
