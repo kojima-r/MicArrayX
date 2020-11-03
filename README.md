@@ -7,6 +7,7 @@ a multi-channel recording is simulated using a single-channel sound source file 
 
 # Installation
 ```
+pip install git+https://github.com/kojima-r/HARK_TF_Parser.git
 pip install git+https://github.com/kojima-r/MicArrayX.git
 ```
 
