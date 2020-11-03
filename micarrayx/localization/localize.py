@@ -245,13 +245,13 @@ def main():
         print("[save]", outfilename)
     # plot heat map
     if args.out_fig:
-        save_heatmap_music_spec(args.out_fig, m_power)
+        music.save_heatmap_music_spec(args.out_fig, m_power)
     # plot heat map with color bar
     if args.out_fig_with_bar:
-        save_heatmap_music_spec_with_bar(args.out_fig_with_bar, m_power)
+        music.save_heatmap_music_spec_with_bar(args.out_fig_with_bar, m_power)
     # plot spectrogram
     if args.out_spectrogram:
-        save_spectrogram(args.out_spectrogram, spec, ch=0)
+        music.save_spectrogram(args.out_spectrogram, spec, ch=0)
 
     ####
     #### Detection part

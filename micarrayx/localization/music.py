@@ -121,7 +121,7 @@ def compute_music_spec(
     for frame, freq in np.ndindex((corr.shape[0], corr.shape[1])):
         # normalize correlation
         rxx = corr[frame, freq]
-        r = rxx / np.max(np.absolute(rxx))
+        r = rxx / np.max(np.absolute(rxx)+1.0e-20)
         #
         # e_val,e_vec = np.linalg.eigh(corr[frame,freq])
         e_val, e_vec = linalg.eig(r)
