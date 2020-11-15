@@ -117,22 +117,25 @@ def main():
     for t in range(nframe):
         current_time=t*time_step
         current_idx=int(current_time/interval)
-        events=tl[current_idx]
-        for e in evets:
-            theta = np.atan2(e["x"][1],e["x"][0])
-            index = micarrayx.nearest_direction_index(tf_config, theta)
-            a_vec = get_beam_vec(tf_config, index)
-            ds_freq = np.zeros((nfreq_bin,), dtype=complex)
-            for freq_bin in range(nfreq_bin):
-                ds_freq[freq_bin] = (
-                    np.dot(a_vec.conj()[freq_bin, :], spec[:, t, freq_bin]) / nch
-                )
-            eid=e["id"]
-            if eid not in sep_specs:
-                sep_specs[eid]=[]
-            sep_specs[eid].append(ds_freq)
+        print(t,current_idx)
+        if current_idx < len(tl):
+            events=tl[current_idx]
+            for e in events:
+                theta = math.atan2(e["x"][1],e["x"][0])
+                index = micarrayx.nearest_direction_index(tf_config, theta)
+                a_vec = get_beam_vec(tf_config, index)
+                ds_freq = np.zeros((nfreq_bin,), dtype=complex)
+                for freq_bin in range(nfreq_bin):
+                    ds_freq[freq_bin] = (
+                        np.dot(a_vec.conj()[freq_bin, :], spec[:, t, freq_bin]) / nch
+                    )
+                eid=e["id"]
+                if eid not in sep_specs:
+                    sep_specs[eid]=[]
+                sep_specs[eid].append(ds_freq)
     ## save separated wav files
-    for eid, sep_spec in sep_specs:
+    for eid, sep_spec in sep_specs.items():
+        print(eid)
         ds_freq=np.array([sep_spec])
         recons_ds = micarrayx.istft_mch(ds_freq, win, args.stft_step)
         out_filename=args.out+"."+str(eid)+".wav"
