@@ -61,7 +61,6 @@ def main():
         default=128,
         help="advance step size for STFT (c.f. overlap=fftLen-step)",
     )
-    
     ### output 
     parser.add_argument(
         "--out",
@@ -69,6 +68,14 @@ def main():
         type=str,
         default="sep",
         help="[output] prefix of separated output wav files",
+    )
+    parser.add_argument(
+        "--out_sep_spectrogram_fig",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--out_sep_spectrogram_csv",
+        action="store_true",
     )
 
     ## argv check
@@ -117,7 +124,7 @@ def main():
     for t in range(nframe):
         current_time=t*time_step
         current_idx=int(current_time/interval)
-        print(t,current_idx)
+        #print(t,current_idx)
         if current_idx < len(tl):
             events=tl[current_idx]
             for e in events:
@@ -135,12 +142,26 @@ def main():
                 sep_specs[eid].append(ds_freq)
     ## save separated wav files
     for eid, sep_spec in sep_specs.items():
-        print(eid)
+        #print(eid)
         ds_freq=np.array([sep_spec])
         recons_ds = micarrayx.istft_mch(ds_freq, win, args.stft_step)
+        ### save files
         out_filename=args.out+"."+str(eid)+".wav"
         print("[SAVE]",out_filename)
         micarrayx.save_mch_wave(recons_ds * 32767.0, out_filename)
+        if args.out_sep_spectrogram_fig:
+            out_filename=args.out+"."+str(eid)+".spec.png"
+            micarrayx.localization.music.save_spectrogram(out_filename, ds_freq, ch=0)
+        if args.out_sep_spectrogram_csv:
+            out_filename=args.out+"."+str(eid)+".spec.csv"
+            print("[SAVE]",out_filename)
+            ch=0
+            with open(out_filename, "w") as fp:
+                for i in range(len(ds_freq[ch])):
+                    v=np.absolute(ds_freq[ch,i,:])
+                    line=",".join(map(str,v))
+                    fp.write(line)
+                    fp.write("\n")
 
 if __name__ == "__main__":
     main()

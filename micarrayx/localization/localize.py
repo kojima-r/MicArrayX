@@ -159,6 +159,13 @@ def main():
         help="[output] fig file to save MUSIC spectrogram (.png)",
     )
     parser.add_argument(
+        "--out_csv",
+        metavar="CSV",
+        type=str,
+        default=None,
+        help="[output] csv file to save MUSIC spectrogram (.csv)",
+    )
+    parser.add_argument(
         "--out_fig_with_bar",
         metavar="FIG_FILE",
         type=str,
@@ -166,11 +173,18 @@ def main():
         help="[output] fig file to save MUSIC spectrogram with color bar(.png)",
     )
     parser.add_argument(
-        "--out_spectrogram",
+        "--out_spectrogram_fig",
         metavar="FIG_FILE",
         type=str,
         default=None,
         help="[output] fig file to save power spectrogram (first channel) (.png)",
+    )
+    parser.add_argument(
+        "--out_spectrogram_csv",
+        metavar="csv",
+        type=str,
+        default=None,
+        help="[output] fig file to save power spectrogram (first channel) (.csv)",
     )
     parser.add_argument(
         "--out_setting",
@@ -246,13 +260,28 @@ def main():
     # plot heat map
     if args.out_fig:
         music.save_heatmap_music_spec(args.out_fig, m_power)
+    if args.out_csv:
+        print("[save]", args.out_csv)
+        with open(args.out_csv, "w") as fp:
+            for i in range(len(m_power)):
+                line=",".join(map(str,m_power[i,:]))
+                fp.write(line)
+                fp.write("\n")
     # plot heat map with color bar
     if args.out_fig_with_bar:
         music.save_heatmap_music_spec_with_bar(args.out_fig_with_bar, m_power)
     # plot spectrogram
-    if args.out_spectrogram:
-        music.save_spectrogram(args.out_spectrogram, spec, ch=0)
-
+    if args.out_spectrogram_fig:
+        music.save_spectrogram(args.out_spectrogram_fig, spec, ch=0)
+    if args.out_spectrogram_csv:
+        print("[save]", args.out_spectrogram_csv)
+        ch=0
+        with open(args.out_spectrogram_csv, "w") as fp:
+            for i in range(len(spec[ch])):
+                v=np.absolute(spec[ch,i,:])
+                line=",".join(map(str,v))
+                fp.write(line)
+                fp.write("\n")
     ####
     #### Detection part
     ####
