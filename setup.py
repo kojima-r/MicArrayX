@@ -21,6 +21,7 @@ setuptools.setup(
             "micarrayx-separate= micarrayx.tool.separation:main",
             "micarrayx-mix= micarrayx.tool.mix:main",
             "micarrayx-sep= micarrayx.tool.sep:main",
+            "micarrayx-channel-selector= micarrayx.tool.selector:main",
             "micarrayx-sim= micarrayx.simulator.sim:main",
             "micarrayx-sim-tf= micarrayx.simulator.sim_tf:main",
             "micarrayx-sim-td= micarrayx.simulator.sim_td:main",
