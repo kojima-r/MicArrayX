@@ -30,7 +30,7 @@ def beamforming_ds(tf_config, spec, n_theta=18):
     nframe = spec.shape[1]
     nfreq_bin = spec.shape[2]
     dtheta=360/n_theta
-    theta = [j*dtheta / 180.0 * math.pi for j in range(n_theta)]
+    theta_list = [j*dtheta / 180.0 * math.pi for j in range(n_theta)]
     result=[]
     for theta in theta_list:
         index = micarrayx.nearest_direction_index(tf_config, theta)
