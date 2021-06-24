@@ -35,10 +35,12 @@ def beamforming_ds(tf_config, spec, n_theta=18):
     for theta in theta_list:
         index = micarrayx.nearest_direction_index(tf_config, theta)
         a_vec = get_beam_vec(tf_config, index)
+        ds_vec = a_vec.conj()[:, :]/np.absolute(a_vec[:, :])
         ds_freq = np.zeros((nframe, nfreq_bin), dtype=complex)
         for t in range(nframe):
             for freq_bin in range(nfreq_bin):
-                ds_freq[t,freq_bin] = np.dot(a_vec.conj()[freq_bin, :], spec[:, t, freq_bin]) / nch
+                ds_freq[t,freq_bin] = np.dot(ds_vec[freq_bin,:], spec[:, t, freq_bin]) / nch
+                #ds_freq[t,freq_bin] = np.dot(a_vec.conj()[freq_bin, :], spec[:, t, freq_bin]) / nch
         result.append(ds_freq)
     return result
 
