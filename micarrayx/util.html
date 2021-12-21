@@ -38,17 +38,24 @@ import numpy as np
 import numpy.random as npr
 import math
 
-# ======
-#  STFT
-# ======
-&#34;&#34;&#34;
-x : 入力信号
-win : 窓関数
-step : シフト幅
-&#34;&#34;&#34;
-
 
 def stft(x, win, step):
+    &#34;&#34;&#34; STFT (Short Term Fourie Transform)
+
+    一次元短時間フーリエ変換
+    Args:
+        x (ndarray): 入力信号(一次元信号)
+        win (int):   窓関数
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(M x N)
+        - N = 窓幅
+        - l = 入力信号の長さ
+        - M = [(l - N + step) / step)]
+
+    &#34;&#34;&#34;
+
     l = len(x)  # 入力信号の長さ
     N = len(win)  # 窓幅、つまり切り出す幅
     M = int(ceil(float(l - N + step) / step))  # スペクトログラムの時間フレーム数
@@ -63,10 +70,23 @@ def stft(x, win, step):
     return X
 
 
-# =======
-#  iSTFT
-# =======
 def istft(X, win, step):
+    &#34;&#34;&#34; ISTFT (Short Term Fourie Transform)
+
+    逆一次元短時間フーリエ変換，stft関数の逆変換を行う
+
+    Args:
+        X (ndarray): 入力信号(M x N　行列)
+        win (int):   窓関数
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: 逆変換後の信号(l)
+        出力信号の長さ: l = [(M - 1) * step + N]
+
+    &#34;&#34;&#34;
+
+
     M, N = X.shape
     assert len(win) == N, &#34;FFT length and window length are different.&#34;
 
@@ -86,6 +106,24 @@ def istft(X, win, step):
 
 
 def apply_window(x, win, step):
+    &#34;&#34;&#34; 窓関数の適用
+
+    スライディングウィンドウを用いて窓関数を適用
+
+    Args:
+        x (ndarray): 入力信号(一次元信号)
+        win (int):   窓関数
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(M x N)
+        - N = 窓幅
+        - l = 入力信号の長さ
+        - M = [(l - N + step) / step)]
+
+    &#34;&#34;&#34;
+
+
     l = len(x)
     N = len(win)
     M = int(ceil(float(l - N + step) / step))
@@ -102,6 +140,23 @@ def apply_window(x, win, step):
 
 
 def read_mch_wave(filename):
+    &#34;&#34;&#34; 多チャンネルwavファイルの読み込み
+
+    Args:
+        filename (str): 入力信号(一次元信号)
+
+    Returns:
+        Dict[str,Obj]: wavファイルの読み込み
+        -  nchannels    : チャンネル数
+        -  sample_width : 1サンプルあたりのバイト数, e.g., 2byte(16bit), 3byte(24bit)
+        -  framerate    : フレームレート
+        -  nframes      : サンプル数
+        -  params       : パラメータ一覧をタプル
+        -  duration     : 秒
+        -  wav          : 波形データnch x nframe
+    &#34;&#34;&#34;
+
+
     wr = wave.open(filename, &#34;rb&#34;)
     # reading data
     data = wr.readframes(wr.getnframes())
@@ -126,6 +181,18 @@ def read_mch_wave(filename):
 def save_mch_wave(
     mix_wavdata, output_filename, sample_width=2, params=None, framerate=16000
 ):
+    &#34;&#34;&#34; 多チャンネルwavファイルの保存
+
+    Args:
+        mix_wavdata: 波形データnch x nframe
+        output_filename (str): 入力信号(一次元信号)
+        sample_width (int): 1サンプルあたりのバイト数, e.g., 2byte(16bit), 3byte(24bit)
+        params (List): その他パラメータ一覧をタプル
+        framerate (int): フレームレート
+
+    &#34;&#34;&#34;
+
+
     a_wavdata = mix_wavdata.transpose()
     out_wavdata = a_wavdata.copy(order=&#34;C&#34;)
     print(&#34;# save data:&#34;, output_filename, out_wavdata.shape)
@@ -147,12 +214,40 @@ def save_mch_wave(
 
 
 def make_full_spectrogram(spec):
+    &#34;&#34;&#34; stft_mch で変換した結果の半分の周波数パワーから全体の周波数パワーを再構成
+
+    Args:
+        spec : 周波数スペクトログラム: nch x freqency_bin
+
+    Return:
+        周波数スペクトログラム: nch x (freqency_bin x 2)
+
+    &#34;&#34;&#34;
+
     spec_c = np.conjugate(spec[:, :0:-1])
     out_spec = np.c_[spec, spec_c[:, 1:]]
     return out_spec
 
 
 def stft_mch(data, win, step):
+    &#34;&#34;&#34; 多チャンネルSTFT(stft関数の多チャンネル版)
+
+    一次元短時間フーリエ変換
+    Args:
+        x (ndarray): 多チャンネル入力信号(Cチャンネルx サンプル数)
+        win (int):   窓関数
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(C x M x N//2+1)
+        - N = 窓幅
+        - l = 入力信号の長さ
+        - M = [(l - N + step) / step)]
+    
+    Note:
+        出力は半分なので注意
+
+    &#34;&#34;&#34;
     fftLen = len(win)
     out_spec = []
     ### STFT
@@ -165,6 +260,23 @@ def stft_mch(data, win, step):
 
 
 def istft_mch(data, win, step):
+    &#34;&#34;&#34; 多チャンネルISTFT (Short Term Fourie Transform)
+
+    逆一次元短時間フーリエ変換
+    stft_mch関数の逆元
+
+    Args:
+        X (ndarray): 入力信号(C x M x N//2+1　行列)
+        win (int):   窓関数
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: 逆変換後の信号(C x l)
+        - 出力信号の長さ: l = [(M - 1) * step + N]
+
+    &#34;&#34;&#34;
+
+
     fftLen = len(win)
     out_wav = []
     ### STFT
@@ -177,8 +289,17 @@ def istft_mch(data, win, step):
     return mch_wav
 
 
-def diff_direction(theta, th):
-    dtheta = abs(theta - th)
+def diff_direction(theta1, theta2):
+    &#34;&#34;&#34; 角度差分
+    Args:
+        theta1 (float): theta1
+        theta2 (float): theta2
+
+    Returns:
+        ndarray: theta1-theta2の角度の差分(-pi &lt; dtheta &lt; pi)
+
+    &#34;&#34;&#34;
+    dtheta = abs(theta1 - theta2)
     if dtheta &gt; 2 * math.pi:
         dtheta -= 2 * math.pi
     if dtheta &gt; math.pi:
@@ -187,6 +308,16 @@ def diff_direction(theta, th):
 
 
 def nearest_direction_index(tf_config, theta):
+    &#34;&#34;&#34; 最も近い伝達関数のインデックスを取得
+    
+    Args:
+        tf_config (Dict): HARK_TF_PARSERで取得できる関数
+        theta (float): 角度(rad)
+
+    Returns:
+        int: 伝達関数インデックス（このインデクスを使ってインデクスを取得できる）
+
+    &#34;&#34;&#34;
     nearest_theta = math.pi
     nearest_index = None
     for key_index, value in list(tf_config[&#34;tf&#34;].items()):
@@ -201,6 +332,16 @@ def nearest_direction_index(tf_config, theta):
 
 
 def nearest_position_index(tf_config, target_pos):
+    &#34;&#34;&#34; 最も近い伝達関数のインデックスを取得
+    
+    Args:
+        tf_config (Dict): HARK_TF_PARSERで取得できる関数
+        target (ndarray): 座標３次元ndarrayで指定
+
+    Returns:
+        int: 伝達関数インデックス（このインデクスを使ってインデクスを取得できる）
+
+    &#34;&#34;&#34;
     nearest_index = None
     nearest_d = None
     for key_index, value in list(tf_config[&#34;tf&#34;].items()):
@@ -213,6 +354,18 @@ def nearest_position_index(tf_config, target_pos):
 
 
 def range_direction_index(tf_config, theta, range_theta):
+    &#34;&#34;&#34; 指定した角度範囲内の伝達関数のインデックスのリストを取得
+    
+    Args:
+        tf_config (Dict): HARK_TF_PARSERで取得できる関数
+        theta (float): 角度(rad)
+        range_theta (float): 角度(rad)
+
+    Returns:
+        List[int]: 伝達関数インデックスのリスト（このインデクスを使ってインデクスを取得できる）
+
+    &#34;&#34;&#34;
+ 
     nearest_theta = math.pi
     ret_indeces = []
     for key_index, value in list(tf_config[&#34;tf&#34;].items()):
@@ -235,12 +388,50 @@ def range_direction_index(tf_config, theta, range_theta):
 <span>def <span class="ident">apply_window</span></span>(<span>x, win, step)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>窓関数の適用</p>
+<p>スライディングウィンドウを用いて窓関数を適用</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>入力信号(一次元信号)</dd>
+<dt><strong><code>win</code></strong> :&ensp;<code>int</code></dt>
+<dd>窓関数</dd>
+<dt><strong><code>step</code></strong> :&ensp;<code>int</code></dt>
+<dd>シフト幅</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>STFTの結果：スペクトログラム(M x N)</dd>
+</dl>
+<ul>
+<li>N = 窓幅</li>
+<li>l = 入力信号の長さ</li>
+<li>M = [(l - N + step) / step)]</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def apply_window(x, win, step):
+    &#34;&#34;&#34; 窓関数の適用
+
+    スライディングウィンドウを用いて窓関数を適用
+
+    Args:
+        x (ndarray): 入力信号(一次元信号)
+        win (int):   窓関数
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(M x N)
+        - N = 窓幅
+        - l = 入力信号の長さ
+        - M = [(l - N + step) / step)]
+
+    &#34;&#34;&#34;
+
+
     l = len(x)
     N = len(win)
     M = int(ceil(float(l - N + step) / step))
@@ -257,16 +448,37 @@ def range_direction_index(tf_config, theta, range_theta):
 </details>
 </dd>
 <dt id="micarrayx.util.diff_direction"><code class="name flex">
-<span>def <span class="ident">diff_direction</span></span>(<span>theta, th)</span>
+<span>def <span class="ident">diff_direction</span></span>(<span>theta1, theta2)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>角度差分</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>theta1</code></strong> :&ensp;<code>float</code></dt>
+<dd>theta1</dd>
+<dt><strong><code>theta2</code></strong> :&ensp;<code>float</code></dt>
+<dd>theta2</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>theta1-theta2の角度の差分(-pi &lt; dtheta &lt; pi)</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def diff_direction(theta, th):
-    dtheta = abs(theta - th)
+<pre><code class="python">def diff_direction(theta1, theta2):
+    &#34;&#34;&#34; 角度差分
+    Args:
+        theta1 (float): theta1
+        theta2 (float): theta2
+
+    Returns:
+        ndarray: theta1-theta2の角度の差分(-pi &lt; dtheta &lt; pi)
+
+    &#34;&#34;&#34;
+    dtheta = abs(theta1 - theta2)
     if dtheta &gt; 2 * math.pi:
         dtheta -= 2 * math.pi
     if dtheta &gt; math.pi:
@@ -278,12 +490,45 @@ def range_direction_index(tf_config, theta, range_theta):
 <span>def <span class="ident">istft</span></span>(<span>X, win, step)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>ISTFT (Short Term Fourie Transform)</p>
+<p>逆一次元短時間フーリエ変換，stft関数の逆変換を行う</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>X</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>入力信号(M x N　行列)</dd>
+<dt><strong><code>win</code></strong> :&ensp;<code>int</code></dt>
+<dd>窓関数</dd>
+<dt><strong><code>step</code></strong> :&ensp;<code>int</code></dt>
+<dd>シフト幅</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>逆変換後の信号(l)</dd>
+<dt><code>出力信号の長さ</code></dt>
+<dd>l = [(M - 1) * step + N]</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def istft(X, win, step):
+    &#34;&#34;&#34; ISTFT (Short Term Fourie Transform)
+
+    逆一次元短時間フーリエ変換，stft関数の逆変換を行う
+
+    Args:
+        X (ndarray): 入力信号(M x N　行列)
+        win (int):   窓関数
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: 逆変換後の信号(l)
+        出力信号の長さ: l = [(M - 1) * step + N]
+
+    &#34;&#34;&#34;
+
+
     M, N = X.shape
     assert len(win) == N, &#34;FFT length and window length are different.&#34;
 
@@ -306,12 +551,48 @@ def range_direction_index(tf_config, theta, range_theta):
 <span>def <span class="ident">istft_mch</span></span>(<span>data, win, step)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>多チャンネルISTFT (Short Term Fourie Transform)</p>
+<p>逆一次元短時間フーリエ変換
+stft_mch関数の逆元</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>X</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>入力信号(C x M x N//2+1　行列)</dd>
+<dt><strong><code>win</code></strong> :&ensp;<code>int</code></dt>
+<dd>窓関数</dd>
+<dt><strong><code>step</code></strong> :&ensp;<code>int</code></dt>
+<dd>シフト幅</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>逆変換後の信号(C x l)</dd>
+</dl>
+<ul>
+<li>出力信号の長さ: l = [(M - 1) * step + N]</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def istft_mch(data, win, step):
+    &#34;&#34;&#34; 多チャンネルISTFT (Short Term Fourie Transform)
+
+    逆一次元短時間フーリエ変換
+    stft_mch関数の逆元
+
+    Args:
+        X (ndarray): 入力信号(C x M x N//2+1　行列)
+        win (int):   窓関数
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: 逆変換後の信号(C x l)
+        - 出力信号の長さ: l = [(M - 1) * step + N]
+
+    &#34;&#34;&#34;
+
+
     fftLen = len(win)
     out_wav = []
     ### STFT
@@ -328,12 +609,26 @@ def range_direction_index(tf_config, theta, range_theta):
 <span>def <span class="ident">make_full_spectrogram</span></span>(<span>spec)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>stft_mch で変換した結果の半分の周波数パワーから全体の周波数パワーを再構成</p>
+<h2 id="args">Args</h2>
+<p>spec : 周波数スペクトログラム: nch x freqency_bin</p>
+<h2 id="return">Return</h2>
+<p>周波数スペクトログラム: nch x (freqency_bin x 2)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def make_full_spectrogram(spec):
+    &#34;&#34;&#34; stft_mch で変換した結果の半分の周波数パワーから全体の周波数パワーを再構成
+
+    Args:
+        spec : 周波数スペクトログラム: nch x freqency_bin
+
+    Return:
+        周波数スペクトログラム: nch x (freqency_bin x 2)
+
+    &#34;&#34;&#34;
+
     spec_c = np.conjugate(spec[:, :0:-1])
     out_spec = np.c_[spec, spec_c[:, 1:]]
     return out_spec</code></pre>
@@ -343,12 +638,34 @@ def range_direction_index(tf_config, theta, range_theta):
 <span>def <span class="ident">nearest_direction_index</span></span>(<span>tf_config, theta)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>最も近い伝達関数のインデックスを取得</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tf_config</code></strong> :&ensp;<code>Dict</code></dt>
+<dd>HARK_TF_PARSERで取得できる関数</dd>
+<dt><strong><code>theta</code></strong> :&ensp;<code>float</code></dt>
+<dd>角度(rad)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>伝達関数インデックス（このインデクスを使ってインデクスを取得できる）</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def nearest_direction_index(tf_config, theta):
+    &#34;&#34;&#34; 最も近い伝達関数のインデックスを取得
+    
+    Args:
+        tf_config (Dict): HARK_TF_PARSERで取得できる関数
+        theta (float): 角度(rad)
+
+    Returns:
+        int: 伝達関数インデックス（このインデクスを使ってインデクスを取得できる）
+
+    &#34;&#34;&#34;
     nearest_theta = math.pi
     nearest_index = None
     for key_index, value in list(tf_config[&#34;tf&#34;].items()):
@@ -366,12 +683,34 @@ def range_direction_index(tf_config, theta, range_theta):
 <span>def <span class="ident">nearest_position_index</span></span>(<span>tf_config, target_pos)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>最も近い伝達関数のインデックスを取得</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tf_config</code></strong> :&ensp;<code>Dict</code></dt>
+<dd>HARK_TF_PARSERで取得できる関数</dd>
+<dt><strong><code>target</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>座標３次元ndarrayで指定</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>伝達関数インデックス（このインデクスを使ってインデクスを取得できる）</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def nearest_position_index(tf_config, target_pos):
+    &#34;&#34;&#34; 最も近い伝達関数のインデックスを取得
+    
+    Args:
+        tf_config (Dict): HARK_TF_PARSERで取得できる関数
+        target (ndarray): 座標３次元ndarrayで指定
+
+    Returns:
+        int: 伝達関数インデックス（このインデクスを使ってインデクスを取得できる）
+
+    &#34;&#34;&#34;
     nearest_index = None
     nearest_d = None
     for key_index, value in list(tf_config[&#34;tf&#34;].items()):
@@ -387,12 +726,38 @@ def range_direction_index(tf_config, theta, range_theta):
 <span>def <span class="ident">range_direction_index</span></span>(<span>tf_config, theta, range_theta)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>指定した角度範囲内の伝達関数のインデックスのリストを取得</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tf_config</code></strong> :&ensp;<code>Dict</code></dt>
+<dd>HARK_TF_PARSERで取得できる関数</dd>
+<dt><strong><code>theta</code></strong> :&ensp;<code>float</code></dt>
+<dd>角度(rad)</dd>
+<dt><strong><code>range_theta</code></strong> :&ensp;<code>float</code></dt>
+<dd>角度(rad)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List[int]</code></dt>
+<dd>伝達関数インデックスのリスト（このインデクスを使ってインデクスを取得できる）</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def range_direction_index(tf_config, theta, range_theta):
+    &#34;&#34;&#34; 指定した角度範囲内の伝達関数のインデックスのリストを取得
+    
+    Args:
+        tf_config (Dict): HARK_TF_PARSERで取得できる関数
+        theta (float): 角度(rad)
+        range_theta (float): 角度(rad)
+
+    Returns:
+        List[int]: 伝達関数インデックスのリスト（このインデクスを使ってインデクスを取得できる）
+
+    &#34;&#34;&#34;
+ 
     nearest_theta = math.pi
     ret_indeces = []
     for key_index, value in list(tf_config[&#34;tf&#34;].items()):
@@ -408,12 +773,54 @@ def range_direction_index(tf_config, theta, range_theta):
 <span>def <span class="ident">read_mch_wave</span></span>(<span>filename)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>多チャンネルwavファイルの読み込み</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>str</code></dt>
+<dd>入力信号(一次元信号)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Dict[str,Obj]</code></dt>
+<dd>wavファイルの読み込み</dd>
+</dl>
+<ul>
+<li>nchannels
+: チャンネル数</li>
+<li>sample_width : 1サンプルあたりのバイト数, e.g., 2byte(16bit), 3byte(24bit)</li>
+<li>framerate
+: フレームレート</li>
+<li>nframes
+: サンプル数</li>
+<li>params
+: パラメータ一覧をタプル</li>
+<li>duration
+: 秒</li>
+<li>wav
+: 波形データnch x nframe</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def read_mch_wave(filename):
+    &#34;&#34;&#34; 多チャンネルwavファイルの読み込み
+
+    Args:
+        filename (str): 入力信号(一次元信号)
+
+    Returns:
+        Dict[str,Obj]: wavファイルの読み込み
+        -  nchannels    : チャンネル数
+        -  sample_width : 1サンプルあたりのバイト数, e.g., 2byte(16bit), 3byte(24bit)
+        -  framerate    : フレームレート
+        -  nframes      : サンプル数
+        -  params       : パラメータ一覧をタプル
+        -  duration     : 秒
+        -  wav          : 波形データnch x nframe
+    &#34;&#34;&#34;
+
+
     wr = wave.open(filename, &#34;rb&#34;)
     # reading data
     data = wr.readframes(wr.getnframes())
@@ -439,7 +846,20 @@ def range_direction_index(tf_config, theta, range_theta):
 <span>def <span class="ident">save_mch_wave</span></span>(<span>mix_wavdata, output_filename, sample_width=2, params=None, framerate=16000)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>多チャンネルwavファイルの保存</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>mix_wavdata</code></strong></dt>
+<dd>波形データnch x nframe</dd>
+<dt><strong><code>output_filename</code></strong> :&ensp;<code>str</code></dt>
+<dd>入力信号(一次元信号)</dd>
+<dt><strong><code>sample_width</code></strong> :&ensp;<code>int</code></dt>
+<dd>1サンプルあたりのバイト数, e.g., 2byte(16bit), 3byte(24bit)</dd>
+<dt><strong><code>params</code></strong> :&ensp;<code>List</code></dt>
+<dd>その他パラメータ一覧をタプル</dd>
+<dt><strong><code>framerate</code></strong> :&ensp;<code>int</code></dt>
+<dd>フレームレート</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -447,6 +867,18 @@ def range_direction_index(tf_config, theta, range_theta):
 <pre><code class="python">def save_mch_wave(
     mix_wavdata, output_filename, sample_width=2, params=None, framerate=16000
 ):
+    &#34;&#34;&#34; 多チャンネルwavファイルの保存
+
+    Args:
+        mix_wavdata: 波形データnch x nframe
+        output_filename (str): 入力信号(一次元信号)
+        sample_width (int): 1サンプルあたりのバイト数, e.g., 2byte(16bit), 3byte(24bit)
+        params (List): その他パラメータ一覧をタプル
+        framerate (int): フレームレート
+
+    &#34;&#34;&#34;
+
+
     a_wavdata = mix_wavdata.transpose()
     out_wavdata = a_wavdata.copy(order=&#34;C&#34;)
     print(&#34;# save data:&#34;, output_filename, out_wavdata.shape)
@@ -471,12 +903,48 @@ def range_direction_index(tf_config, theta, range_theta):
 <span>def <span class="ident">stft</span></span>(<span>x, win, step)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>STFT (Short Term Fourie Transform)</p>
+<p>一次元短時間フーリエ変換</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>入力信号(一次元信号)</dd>
+<dt><strong><code>win</code></strong> :&ensp;<code>int</code></dt>
+<dd>窓関数</dd>
+<dt><strong><code>step</code></strong> :&ensp;<code>int</code></dt>
+<dd>シフト幅</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>STFTの結果：スペクトログラム(M x N)</dd>
+</dl>
+<ul>
+<li>N = 窓幅</li>
+<li>l = 入力信号の長さ</li>
+<li>M = [(l - N + step) / step)]</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def stft(x, win, step):
+    &#34;&#34;&#34; STFT (Short Term Fourie Transform)
+
+    一次元短時間フーリエ変換
+    Args:
+        x (ndarray): 入力信号(一次元信号)
+        win (int):   窓関数
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(M x N)
+        - N = 窓幅
+        - l = 入力信号の長さ
+        - M = [(l - N + step) / step)]
+
+    &#34;&#34;&#34;
+
     l = len(x)  # 入力信号の長さ
     N = len(win)  # 窓幅、つまり切り出す幅
     M = int(ceil(float(l - N + step) / step))  # スペクトログラムの時間フレーム数
@@ -495,12 +963,52 @@ def range_direction_index(tf_config, theta, range_theta):
 <span>def <span class="ident">stft_mch</span></span>(<span>data, win, step)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>多チャンネルSTFT(stft関数の多チャンネル版)</p>
+<p>一次元短時間フーリエ変換</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>多チャンネル入力信号(Cチャンネルx サンプル数)</dd>
+<dt><strong><code>win</code></strong> :&ensp;<code>int</code></dt>
+<dd>窓関数</dd>
+<dt><strong><code>step</code></strong> :&ensp;<code>int</code></dt>
+<dd>シフト幅</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>STFTの結果：スペクトログラム(C x M x N//2+1)</dd>
+</dl>
+<ul>
+<li>N = 窓幅</li>
+<li>l = 入力信号の長さ</li>
+<li>M = [(l - N + step) / step)]</li>
+</ul>
+<h2 id="note">Note</h2>
+<p>出力は半分なので注意</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def stft_mch(data, win, step):
+    &#34;&#34;&#34; 多チャンネルSTFT(stft関数の多チャンネル版)
+
+    一次元短時間フーリエ変換
+    Args:
+        x (ndarray): 多チャンネル入力信号(Cチャンネルx サンプル数)
+        win (int):   窓関数
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(C x M x N//2+1)
+        - N = 窓幅
+        - l = 入力信号の長さ
+        - M = [(l - N + step) / step)]
+    
+    Note:
+        出力は半分なので注意
+
+    &#34;&#34;&#34;
     fftLen = len(win)
     out_spec = []
     ### STFT

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>micarrayx.localization.music API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="command: micarrayx-localize-music" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,11 +22,14 @@
 <h1 class="title">Module <code>micarrayx.localization.music</code></h1>
 </header>
 <section id="section-intro">
+<p>command: micarrayx-localize-music</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
+&#34;&#34;&#34; command: micarrayx-localize-music
+&#34;&#34;&#34;
 import sys
 import numpy as np
 import argparse
@@ -62,6 +65,18 @@ def slice_window(x, win_size, step):
 
 
 def estimate_spatial_correlation(spec, win_size, step):
+    &#34;&#34;&#34; 空間相関行列の計算
+
+    Args:
+        spec (ndarray): 入力信号(channel x #frame x frequency_bin)
+        win_size (int):   窓幅
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x channel x channel)
+        - 複数フレームを用いてブロックを構成する(構成時のパラメータがwin_size, step)
+
+    &#34;&#34;&#34;
     # ch,frame,spec -&gt; frame,spec,ch
     x = np.transpose(spec, (1, 2, 0))
     # data: frame,block,spec,ch
@@ -77,6 +92,19 @@ def estimate_spatial_correlation(spec, win_size, step):
 
 
 def estimate_spatial_correlation2(spec, win_size, step):
+    &#34;&#34;&#34; 空間相関行列の計算2
+
+    Args:
+        spec (ndarray): 入力信号(channel x #frame x frequency_bin)
+        win_size (int):   窓幅
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x channel x channel)
+        - 複数フレームを用いてブロックを構成する(構成時のパラメータがwin_size, step)
+
+    &#34;&#34;&#34;
+
     # ch,frame,spec -&gt; frame,spec,ch
     n_ch = spec.shape[0]
     n_frame = spec.shape[1]
@@ -136,12 +164,33 @@ f1 = interpolate.interp1d(f, w, kind=&#34;cubic&#34;)
 
 
 def A_characteristic(freq):
+    &#34;&#34;&#34; A特性の計算
+    
+    予め用意したテーブルからA特性を計算して返す
+    
+    &#34;&#34;&#34;
     return f1(freq)
 
 
 def compute_music_spec(
     spec, src_num, tf_config, df, min_freq_bin=0, win_size=50, step=50
 ):
+    &#34;&#34;&#34; 空間パワー（MUSIC spectrum）の計算
+
+    Args:
+        spec (ndarray): 入力信号(channel x #frame x frequency_bin)
+        src_num (int): 想定音源数
+        tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
+        df: 周波数ビンあたりの周波数： フーリエ変換字のパラメータから計算される
+        min_freq_bin (int): 計算に使う最小周波数ビン（ノイズの多い低周波を無視するため）
+        win_size (int):   窓幅
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x k)
+        - k: 方向のインデックス
+
+    &#34;&#34;&#34;
     corr = estimate_spatial_correlation2(spec, win_size, step)
     power = np.zeros(
         (corr.shape[0], corr.shape[1], len(tf_config[&#34;tf&#34;])), dtype=complex
@@ -232,6 +281,29 @@ def compute_music_power(
     music_win_size,
     music_step,
 ):
+    &#34;&#34;&#34; wavファイルからの空間パワー（MUSIC spectrum）の計算
+
+    Args:
+        wav_filename (str): 入力wavファイル名
+        tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
+        normalize_factor: 入力波形/ normalize_factor　として入力波形の調整をする
+        src_num (int): 想定音源数(MUSIC法パラメータ)
+        min_freq (int): 計算に使う最小周波数（ノイズの多い低周波を無視するため）
+        max_freq (int): 計算に使う最大周波数（ノイズの多い高周波を無視するため）
+        fftLen (int):   窓幅
+        stft_step (int):  シフト幅
+        music_win_size (int):   窓幅
+        music_step (int):  シフト幅
+        
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x k)
+        - spec: stftの結果
+        - m_power: 空間パワー 周波数について平均化した結果 (#block x k)
+        - m_full_power: 空間パワー (#block x frequency_bin x k)
+        - setting: 各種セッティング
+
+    &#34;&#34;&#34;
     setting = {}
     # read wav
     print(&#34;... reading&#34;, wav_filename)
@@ -465,12 +537,18 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">A_characteristic</span></span>(<span>freq)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>A特性の計算</p>
+<p>予め用意したテーブルからA特性を計算して返す</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def A_characteristic(freq):
+    &#34;&#34;&#34; A特性の計算
+    
+    予め用意したテーブルからA特性を計算して返す
+    
+    &#34;&#34;&#34;
     return f1(freq)</code></pre>
 </details>
 </dd>
@@ -478,7 +556,41 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">compute_music_power</span></span>(<span>wav_filename, tf_config, normalize_factor, fftLen, stft_step, min_freq, max_freq, src_num, music_win_size, music_step)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>wavファイルからの空間パワー（MUSIC spectrum）の計算</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>wav_filename</code></strong> :&ensp;<code>str</code></dt>
+<dd>入力wavファイル名</dd>
+<dt><strong><code>tf_config</code></strong> :&ensp;<code>Dict</code></dt>
+<dd>HARK_TF_PARSERで取得できる伝達関数</dd>
+<dt><strong><code>normalize_factor</code></strong></dt>
+<dd>入力波形/ normalize_factor　として入力波形の調整をする</dd>
+<dt><strong><code>src_num</code></strong> :&ensp;<code>int</code></dt>
+<dd>想定音源数(MUSIC法パラメータ)</dd>
+<dt><strong><code>min_freq</code></strong> :&ensp;<code>int</code></dt>
+<dd>計算に使う最小周波数（ノイズの多い低周波を無視するため）</dd>
+<dt><strong><code>max_freq</code></strong> :&ensp;<code>int</code></dt>
+<dd>計算に使う最大周波数（ノイズの多い高周波を無視するため）</dd>
+<dt><strong><code>fftLen</code></strong> :&ensp;<code>int</code></dt>
+<dd>窓幅</dd>
+<dt><strong><code>stft_step</code></strong> :&ensp;<code>int</code></dt>
+<dd>シフト幅</dd>
+<dt><strong><code>music_win_size</code></strong> :&ensp;<code>int</code></dt>
+<dd>窓幅</dd>
+<dt><strong><code>music_step</code></strong> :&ensp;<code>int</code></dt>
+<dd>シフト幅</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>STFTの結果：スペクトログラム(#block x frequency_bin x k)</dd>
+</dl>
+<ul>
+<li>spec: stftの結果</li>
+<li>m_power: 空間パワー 周波数について平均化した結果 (#block x k)</li>
+<li>m_full_power: 空間パワー (#block x frequency_bin x k)</li>
+<li>setting: 各種セッティング</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -495,6 +607,29 @@ if __name__ == &#34;__main__&#34;:
     music_win_size,
     music_step,
 ):
+    &#34;&#34;&#34; wavファイルからの空間パワー（MUSIC spectrum）の計算
+
+    Args:
+        wav_filename (str): 入力wavファイル名
+        tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
+        normalize_factor: 入力波形/ normalize_factor　として入力波形の調整をする
+        src_num (int): 想定音源数(MUSIC法パラメータ)
+        min_freq (int): 計算に使う最小周波数（ノイズの多い低周波を無視するため）
+        max_freq (int): 計算に使う最大周波数（ノイズの多い高周波を無視するため）
+        fftLen (int):   窓幅
+        stft_step (int):  シフト幅
+        music_win_size (int):   窓幅
+        music_step (int):  シフト幅
+        
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x k)
+        - spec: stftの結果
+        - m_power: 空間パワー 周波数について平均化した結果 (#block x k)
+        - m_full_power: 空間パワー (#block x frequency_bin x k)
+        - setting: 各種セッティング
+
+    &#34;&#34;&#34;
     setting = {}
     # read wav
     print(&#34;... reading&#34;, wav_filename)
@@ -554,7 +689,32 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">compute_music_spec</span></span>(<span>spec, src_num, tf_config, df, min_freq_bin=0, win_size=50, step=50)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>空間パワー（MUSIC spectrum）の計算</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>spec</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>入力信号(channel x #frame x frequency_bin)</dd>
+<dt><strong><code>src_num</code></strong> :&ensp;<code>int</code></dt>
+<dd>想定音源数</dd>
+<dt><strong><code>tf_config</code></strong> :&ensp;<code>Dict</code></dt>
+<dd>HARK_TF_PARSERで取得できる伝達関数</dd>
+<dt><strong><code>df</code></strong></dt>
+<dd>周波数ビンあたりの周波数： フーリエ変換字のパラメータから計算される</dd>
+<dt><strong><code>min_freq_bin</code></strong> :&ensp;<code>int</code></dt>
+<dd>計算に使う最小周波数ビン（ノイズの多い低周波を無視するため）</dd>
+<dt><strong><code>win_size</code></strong> :&ensp;<code>int</code></dt>
+<dd>窓幅</dd>
+<dt><strong><code>step</code></strong> :&ensp;<code>int</code></dt>
+<dd>シフト幅</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>STFTの結果：スペクトログラム(#block x frequency_bin x k)</dd>
+</dl>
+<ul>
+<li>k: 方向のインデックス</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -562,6 +722,22 @@ if __name__ == &#34;__main__&#34;:
 <pre><code class="python">def compute_music_spec(
     spec, src_num, tf_config, df, min_freq_bin=0, win_size=50, step=50
 ):
+    &#34;&#34;&#34; 空間パワー（MUSIC spectrum）の計算
+
+    Args:
+        spec (ndarray): 入力信号(channel x #frame x frequency_bin)
+        src_num (int): 想定音源数
+        tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
+        df: 周波数ビンあたりの周波数： フーリエ変換字のパラメータから計算される
+        min_freq_bin (int): 計算に使う最小周波数ビン（ノイズの多い低周波を無視するため）
+        win_size (int):   窓幅
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x k)
+        - k: 方向のインデックス
+
+    &#34;&#34;&#34;
     corr = estimate_spatial_correlation2(spec, win_size, step)
     power = np.zeros(
         (corr.shape[0], corr.shape[1], len(tf_config[&#34;tf&#34;])), dtype=complex
@@ -595,12 +771,41 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">estimate_spatial_correlation</span></span>(<span>spec, win_size, step)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>空間相関行列の計算</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>spec</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>入力信号(channel x #frame x frequency_bin)</dd>
+<dt><strong><code>win_size</code></strong> :&ensp;<code>int</code></dt>
+<dd>窓幅</dd>
+<dt><strong><code>step</code></strong> :&ensp;<code>int</code></dt>
+<dd>シフト幅</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>STFTの結果：スペクトログラム(#block x frequency_bin x channel x channel)</dd>
+</dl>
+<ul>
+<li>複数フレームを用いてブロックを構成する(構成時のパラメータがwin_size, step)</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def estimate_spatial_correlation(spec, win_size, step):
+    &#34;&#34;&#34; 空間相関行列の計算
+
+    Args:
+        spec (ndarray): 入力信号(channel x #frame x frequency_bin)
+        win_size (int):   窓幅
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x channel x channel)
+        - 複数フレームを用いてブロックを構成する(構成時のパラメータがwin_size, step)
+
+    &#34;&#34;&#34;
     # ch,frame,spec -&gt; frame,spec,ch
     x = np.transpose(spec, (1, 2, 0))
     # data: frame,block,spec,ch
@@ -619,12 +824,42 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">estimate_spatial_correlation2</span></span>(<span>spec, win_size, step)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>空間相関行列の計算2</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>spec</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>入力信号(channel x #frame x frequency_bin)</dd>
+<dt><strong><code>win_size</code></strong> :&ensp;<code>int</code></dt>
+<dd>窓幅</dd>
+<dt><strong><code>step</code></strong> :&ensp;<code>int</code></dt>
+<dd>シフト幅</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>STFTの結果：スペクトログラム(#block x frequency_bin x channel x channel)</dd>
+</dl>
+<ul>
+<li>複数フレームを用いてブロックを構成する(構成時のパラメータがwin_size, step)</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def estimate_spatial_correlation2(spec, win_size, step):
+    &#34;&#34;&#34; 空間相関行列の計算2
+
+    Args:
+        spec (ndarray): 入力信号(channel x #frame x frequency_bin)
+        win_size (int):   窓幅
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x channel x channel)
+        - 複数フレームを用いてブロックを構成する(構成時のパラメータがwin_size, step)
+
+    &#34;&#34;&#34;
+
     # ch,frame,spec -&gt; frame,spec,ch
     n_ch = spec.shape[0]
     n_frame = spec.shape[1]

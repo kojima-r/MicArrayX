@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>micarrayx.tool.make_noise API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="command: micarrayx-make-noise" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,12 +22,14 @@
 <h1 class="title">Module <code>micarrayx.tool.make_noise</code></h1>
 </header>
 <section id="section-intro">
+<p>command: micarrayx-make-noise</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
-
+&#34;&#34;&#34; command: micarrayx-make-noise
+&#34;&#34;&#34;
 from scipy import ceil, complex64, float64, hamming, zeros
 import wave
 import array
@@ -53,6 +55,27 @@ def rand_noise(x):
 
 
 def make_white_noise_freq(nch, length, fftLen, step):
+    &#34;&#34;&#34;白色ノイズの作成（周波数領域）
+
+    関数についての説明文
+    Args:
+        nch (int):    チャンネル数
+        length (int): STFTパラメータ：サンプル数
+        fftLen (int): STFTパラメータ：FFTの長さ
+        step (int):   STFTパラメータ：
+
+    Returns:
+        ndarray: ホワイトノイズの結果
+    
+    Examples:
+        &gt;&gt;&gt; nsamples=16000
+        &gt;&gt;&gt; fftLen=512
+        &gt;&gt;&gt; step=256
+        &gt;&gt;&gt; length = ((nsamples - (fftLen - step)) - 1) / step + 1
+        &gt;&gt;&gt; wav_freq=make_white_noise_freq(nch=1, length=length, fftLen=fftLen, step=step)
+        &gt;&gt;&gt; wav_freq.shape
+
+    &#34;&#34;&#34;
     # stft length &lt;-&gt; samples
     src_volume = 1
     data = np.zeros((nch, int(length), fftLen // 2 + 1), dtype=complex64)
@@ -74,6 +97,27 @@ def make_white_noise_freq(nch, length, fftLen, step):
 
 
 def make_white_noise(nch, length, fftLen, step):
+    &#34;&#34;&#34;白色ノイズの作成
+
+    関数についての説明文
+    Args:
+        nch (int):    チャンネル数
+        length (int): STFTパラメータ：サンプル数
+        fftLen (int): STFTパラメータ：FFTの長さ
+        step (int):   STFTパラメータ：
+
+    Returns:
+        ndarray: ホワイトノイズの結果
+    
+    Examples:
+        &gt;&gt;&gt; nsamples=16000
+        &gt;&gt;&gt; fftLen=512
+        &gt;&gt;&gt; step=256
+        &gt;&gt;&gt; length = ((nsamples - (fftLen - step)) - 1) / step + 1
+        &gt;&gt;&gt; wav=make_white_noise(nch=1, length=length, fftLen=fftLen, step=step)
+        &gt;&gt;&gt; wav.shape
+
+    &#34;&#34;&#34;
     # stft length &lt;-&gt; samples
     src_volume = 1
     data = make_white_noise_freq(nch, length, fftLen, step)
@@ -386,12 +430,58 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">make_white_noise</span></span>(<span>nch, length, fftLen, step)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>白色ノイズの作成</p>
+<p>関数についての説明文</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>nch</code></strong> :&ensp;<code>int</code></dt>
+<dd>チャンネル数</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>int</code></dt>
+<dd>STFTパラメータ：サンプル数</dd>
+<dt><strong><code>fftLen</code></strong> :&ensp;<code>int</code></dt>
+<dd>STFTパラメータ：FFTの長さ</dd>
+<dt><strong><code>step</code></strong> :&ensp;<code>int</code></dt>
+<dd>STFTパラメータ：</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>ホワイトノイズの結果</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; nsamples=16000
+&gt;&gt;&gt; fftLen=512
+&gt;&gt;&gt; step=256
+&gt;&gt;&gt; length = ((nsamples - (fftLen - step)) - 1) / step + 1
+&gt;&gt;&gt; wav=make_white_noise(nch=1, length=length, fftLen=fftLen, step=step)
+&gt;&gt;&gt; wav.shape
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def make_white_noise(nch, length, fftLen, step):
+    &#34;&#34;&#34;白色ノイズの作成
+
+    関数についての説明文
+    Args:
+        nch (int):    チャンネル数
+        length (int): STFTパラメータ：サンプル数
+        fftLen (int): STFTパラメータ：FFTの長さ
+        step (int):   STFTパラメータ：
+
+    Returns:
+        ndarray: ホワイトノイズの結果
+    
+    Examples:
+        &gt;&gt;&gt; nsamples=16000
+        &gt;&gt;&gt; fftLen=512
+        &gt;&gt;&gt; step=256
+        &gt;&gt;&gt; length = ((nsamples - (fftLen - step)) - 1) / step + 1
+        &gt;&gt;&gt; wav=make_white_noise(nch=1, length=length, fftLen=fftLen, step=step)
+        &gt;&gt;&gt; wav.shape
+
+    &#34;&#34;&#34;
     # stft length &lt;-&gt; samples
     src_volume = 1
     data = make_white_noise_freq(nch, length, fftLen, step)
@@ -417,12 +507,58 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">make_white_noise_freq</span></span>(<span>nch, length, fftLen, step)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>白色ノイズの作成（周波数領域）</p>
+<p>関数についての説明文</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>nch</code></strong> :&ensp;<code>int</code></dt>
+<dd>チャンネル数</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>int</code></dt>
+<dd>STFTパラメータ：サンプル数</dd>
+<dt><strong><code>fftLen</code></strong> :&ensp;<code>int</code></dt>
+<dd>STFTパラメータ：FFTの長さ</dd>
+<dt><strong><code>step</code></strong> :&ensp;<code>int</code></dt>
+<dd>STFTパラメータ：</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>ホワイトノイズの結果</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; nsamples=16000
+&gt;&gt;&gt; fftLen=512
+&gt;&gt;&gt; step=256
+&gt;&gt;&gt; length = ((nsamples - (fftLen - step)) - 1) / step + 1
+&gt;&gt;&gt; wav_freq=make_white_noise_freq(nch=1, length=length, fftLen=fftLen, step=step)
+&gt;&gt;&gt; wav_freq.shape
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def make_white_noise_freq(nch, length, fftLen, step):
+    &#34;&#34;&#34;白色ノイズの作成（周波数領域）
+
+    関数についての説明文
+    Args:
+        nch (int):    チャンネル数
+        length (int): STFTパラメータ：サンプル数
+        fftLen (int): STFTパラメータ：FFTの長さ
+        step (int):   STFTパラメータ：
+
+    Returns:
+        ndarray: ホワイトノイズの結果
+    
+    Examples:
+        &gt;&gt;&gt; nsamples=16000
+        &gt;&gt;&gt; fftLen=512
+        &gt;&gt;&gt; step=256
+        &gt;&gt;&gt; length = ((nsamples - (fftLen - step)) - 1) / step + 1
+        &gt;&gt;&gt; wav_freq=make_white_noise_freq(nch=1, length=length, fftLen=fftLen, step=step)
+        &gt;&gt;&gt; wav_freq.shape
+
+    &#34;&#34;&#34;
     # stft length &lt;-&gt; samples
     src_volume = 1
     data = np.zeros((nch, int(length), fftLen // 2 + 1), dtype=complex64)

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>micarrayx.localization.localize API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="command: micarrayx-localize" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,11 +22,14 @@
 <h1 class="title">Module <code>micarrayx.localization.localize</code></h1>
 </header>
 <section id="section-intro">
+<p>command: micarrayx-localize</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
+&#34;&#34;&#34; command: micarrayx-localize
+&#34;&#34;&#34;
 import sys
 import numpy as np
 from scipy import hamming, interpolate
@@ -49,6 +52,20 @@ from micarrayx.localization import music
 
 
 def detect_island(vec):
+    &#34;&#34;&#34; 入力ベクトルの0以上の部分でまとまり（island）を検出する
+
+    
+    &gt;&gt;&gt; e.g.: [  1,  2,  3,  2,  -1,  -3, -1,  2,  3]
+    &gt;&gt;&gt; =&gt;  [[(0,1),(1,2),(2,3),(3,2)], [(7,2),(8,3)]]
+
+    Args:
+        vec (ndarray): 入力信号(一次元信号)
+
+    Returns:
+        List: island のリスト
+
+    &#34;&#34;&#34;
+
     o = []
     out = []
     for i, el in enumerate(vec):
@@ -70,6 +87,19 @@ def detect_island(vec):
 
 
 def detect_all_peaks(vec):
+    &#34;&#34;&#34; 入力ベクトルのピークを検出する
+
+    
+    &gt;&gt;&gt; e.g.: [  1,  2,  3,  2,  -1,  -3, -1,  2,  3]
+    &gt;&gt;&gt; =&gt;  [[([2],3),([8],3)]]
+
+    Args:
+        vec (ndarray): 入力信号(一次元信号)
+
+    Returns:
+        List: ピーク点 のリスト
+
+    &#34;&#34;&#34;
     islands = detect_island(vec)
     peaks = []
     for el in islands:
@@ -86,9 +116,22 @@ def detect_all_peaks(vec):
 
 
 def detect_peak(vec):
+    &#34;&#34;&#34; 入力ベクトルのピークを検出する(同じ点が複数ある場合に中央をとる)
+
+    
+    &gt;&gt;&gt; e.g.: [  1,  2,  3,  2,  -1,  -3, -1,  2,  3]
+    &gt;&gt;&gt; =&gt;  [[(2,3),(8,3)]]
+
+    Args:
+        vec (ndarray): 入力信号(一次元信号)
+
+    Returns:
+        List: ピーク点 のリスト
+
+    &#34;&#34;&#34;
     peaks = []
     all_peaks = detect_all_peaks(vec)
-    for el in all_peaks:
+    for el in all_peaks: #同じ点が複数場合
         c = len(el[0]) // 2
         peaks.append(el[0][c])
     return peaks
@@ -435,12 +478,38 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">detect_all_peaks</span></span>(<span>vec)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>入力ベクトルのピークを検出する</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; e.g.: [  1,  2,  3,  2,  -1,  -3, -1,  2,  3]
+&gt;&gt;&gt; =&gt;  [[([2],3),([8],3)]]
+</code></pre>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>vec</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>入力信号(一次元信号)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List</code></dt>
+<dd>ピーク点 のリスト</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def detect_all_peaks(vec):
+    &#34;&#34;&#34; 入力ベクトルのピークを検出する
+
+    
+    &gt;&gt;&gt; e.g.: [  1,  2,  3,  2,  -1,  -3, -1,  2,  3]
+    &gt;&gt;&gt; =&gt;  [[([2],3),([8],3)]]
+
+    Args:
+        vec (ndarray): 入力信号(一次元信号)
+
+    Returns:
+        List: ピーク点 のリスト
+
+    &#34;&#34;&#34;
     islands = detect_island(vec)
     peaks = []
     for el in islands:
@@ -460,12 +529,39 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">detect_island</span></span>(<span>vec)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>入力ベクトルの0以上の部分でまとまり（island）を検出する</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; e.g.: [  1,  2,  3,  2,  -1,  -3, -1,  2,  3]
+&gt;&gt;&gt; =&gt;  [[(0,1),(1,2),(2,3),(3,2)], [(7,2),(8,3)]]
+</code></pre>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>vec</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>入力信号(一次元信号)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List</code></dt>
+<dd>island のリスト</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def detect_island(vec):
+    &#34;&#34;&#34; 入力ベクトルの0以上の部分でまとまり（island）を検出する
+
+    
+    &gt;&gt;&gt; e.g.: [  1,  2,  3,  2,  -1,  -3, -1,  2,  3]
+    &gt;&gt;&gt; =&gt;  [[(0,1),(1,2),(2,3),(3,2)], [(7,2),(8,3)]]
+
+    Args:
+        vec (ndarray): 入力信号(一次元信号)
+
+    Returns:
+        List: island のリスト
+
+    &#34;&#34;&#34;
+
     o = []
     out = []
     for i, el in enumerate(vec):
@@ -490,15 +586,41 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">detect_peak</span></span>(<span>vec)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>入力ベクトルのピークを検出する(同じ点が複数ある場合に中央をとる)</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; e.g.: [  1,  2,  3,  2,  -1,  -3, -1,  2,  3]
+&gt;&gt;&gt; =&gt;  [[(2,3),(8,3)]]
+</code></pre>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>vec</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>入力信号(一次元信号)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List</code></dt>
+<dd>ピーク点 のリスト</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def detect_peak(vec):
+    &#34;&#34;&#34; 入力ベクトルのピークを検出する(同じ点が複数ある場合に中央をとる)
+
+    
+    &gt;&gt;&gt; e.g.: [  1,  2,  3,  2,  -1,  -3, -1,  2,  3]
+    &gt;&gt;&gt; =&gt;  [[(2,3),(8,3)]]
+
+    Args:
+        vec (ndarray): 入力信号(一次元信号)
+
+    Returns:
+        List: ピーク点 のリスト
+
+    &#34;&#34;&#34;
     peaks = []
     all_peaks = detect_all_peaks(vec)
-    for el in all_peaks:
+    for el in all_peaks: #同じ点が複数場合
         c = len(el[0]) // 2
         peaks.append(el[0][c])
     return peaks</code></pre>
