@@ -5,6 +5,7 @@ A signal processing library for multi-channel sound recorded by a microphone arr
 a multi-channel recording is simulated using a single-channel sound source file (wav file) and a transfer function or geometric calculation.
 - Localoization and separation: this library also implements a basic algorithm for sound source localization and sound source separation.
 
+
 # Installation
 ```
 pip install git+https://github.com/kojima-r/HARK_TF_Parser.git
@@ -13,6 +14,9 @@ pip install git+https://github.com/kojima-r/MicArrayX.git
 # Tutorial
 
 MicArrayX_tutorial.ipynb: https://colab.research.google.com/drive/1pscHRoQxtvA_u9eq72cDCZGZcAMp6CwI?usp=sharing
+
+Python API: [Documentation](https://kojima-r.github.io/MicArrayX/micarrayx/index.html)
+
 
 # Example
 
