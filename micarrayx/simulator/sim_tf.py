@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+""" command: micarrayx-sim-tf
+"""
 from scipy import ceil, complex64, float64, hamming, zeros
 from scipy.fftpack import fft
 from scipy import ifft
@@ -26,6 +28,21 @@ def make_noise(x):
 
 
 def apply_tf_spec(data, fftLen, step, tf_config, src_index, noise_amp=0):
+    """ 伝達関数の適用
+
+    Args:
+        data (ndarray): 周波数スペクトログラム(channel x #sample x frequency_bin)
+        fftLen (int):   窓関数
+        step (int):  シフト幅
+        tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
+        src_index (int): 伝達関数インデックス
+        noise_amp (float):  ノイズの大きさ
+
+    Returns:
+        ndarray: 伝達関数適用後のスペクトログラム(channel x #sample x frequency_bin)
+
+    """
+
     win = hamming(fftLen)  # ハミング窓
     ### STFT
     spectrogram = micarrayx.stft(data, win, step)
@@ -55,6 +72,22 @@ def apply_tf_spec(data, fftLen, step, tf_config, src_index, noise_amp=0):
 
 
 def apply_tf(data, fftLen, step, tf_config, src_index, noise_amp=0):
+    """ 伝達関数の適用
+
+    Args:
+        data (ndarray): 周波数スペクトログラム(channel x #sample x frequency_bin)
+        fftLen (int):   窓関数
+        step (int):  シフト幅
+        tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
+        src_index (int): 伝達関数インデックス
+        noise_amp (float):  ノイズの大きさ
+
+    Returns:
+        ndarray: 伝達関数適用後の信号(channel x #sample)
+
+    """
+
+
     win = hamming(fftLen)  # ハミング窓
     mch_data = apply_tf_spec(data, fftLen, step, tf_config, src_index, noise_amp)
     out_wavdata = []

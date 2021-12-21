@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+""" command: micarrayx-separate
+"""
 from hark_tf.read_param import read_hark_tf_param
 from hark_tf.read_mat import read_hark_tf
 import sys

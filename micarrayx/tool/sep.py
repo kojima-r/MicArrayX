@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+""" command: micarrayx-sep
+"""
 import matplotlib
 
 matplotlib.use("Agg")

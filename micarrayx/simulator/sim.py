@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+""" command: micarrayx-sim
+"""
 import wave
 import array
 from matplotlib import pylab as pl

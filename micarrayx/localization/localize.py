@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+""" command: micarrayx-localize
+"""
 import sys
 import numpy as np
 from scipy import hamming, interpolate
@@ -21,6 +23,20 @@ from micarrayx.localization import music
 
 
 def detect_island(vec):
+    """ 入力ベクトルの0以上の部分でまとまり（island）を検出する
+
+    
+    >>> e.g.: [  1,  2,  3,  2,  -1,  -3, -1,  2,  3]
+    >>> =>  [[(0,1),(1,2),(2,3),(3,2)], [(7,2),(8,3)]]
+
+    Args:
+        vec (ndarray): 入力信号(一次元信号)
+
+    Returns:
+        List: island のリスト
+
+    """
+
     o = []
     out = []
     for i, el in enumerate(vec):
@@ -42,6 +58,19 @@ def detect_island(vec):
 
 
 def detect_all_peaks(vec):
+    """ 入力ベクトルのピークを検出する
+
+    
+    >>> e.g.: [  1,  2,  3,  2,  -1,  -3, -1,  2,  3]
+    >>> =>  [[([2],3),([8],3)]]
+
+    Args:
+        vec (ndarray): 入力信号(一次元信号)
+
+    Returns:
+        List: ピーク点 のリスト
+
+    """
     islands = detect_island(vec)
     peaks = []
     for el in islands:
@@ -58,9 +87,22 @@ def detect_all_peaks(vec):
 
 
 def detect_peak(vec):
+    """ 入力ベクトルのピークを検出する(同じ点が複数ある場合に中央をとる)
+
+    
+    >>> e.g.: [  1,  2,  3,  2,  -1,  -3, -1,  2,  3]
+    >>> =>  [[(2,3),(8,3)]]
+
+    Args:
+        vec (ndarray): 入力信号(一次元信号)
+
+    Returns:
+        List: ピーク点 のリスト
+
+    """
     peaks = []
     all_peaks = detect_all_peaks(vec)
-    for el in all_peaks:
+    for el in all_peaks: #同じ点が複数場合
         c = len(el[0]) // 2
         peaks.append(el[0][c])
     return peaks

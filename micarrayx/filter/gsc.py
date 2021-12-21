@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+""" command: micarrayx-filter-gsc
+"""
 from scipy import ceil, complex64, float64, hamming, zeros
 from scipy.fftpack import fft
 from scipy import ifft

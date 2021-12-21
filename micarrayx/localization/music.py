@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+""" command: micarrayx-localize-music
+"""
 import sys
 import numpy as np
 import argparse
@@ -34,6 +36,18 @@ def slice_window(x, win_size, step):
 
 
 def estimate_spatial_correlation(spec, win_size, step):
+    """ 空間相関行列の計算
+
+    Args:
+        spec (ndarray): 入力信号(channel x #frame x frequency_bin)
+        win_size (int):   窓幅
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x channel x channel)
+        - 複数フレームを用いてブロックを構成する(構成時のパラメータがwin_size, step)
+
+    """
     # ch,frame,spec -> frame,spec,ch
     x = np.transpose(spec, (1, 2, 0))
     # data: frame,block,spec,ch
@@ -49,6 +63,19 @@ def estimate_spatial_correlation(spec, win_size, step):
 
 
 def estimate_spatial_correlation2(spec, win_size, step):
+    """ 空間相関行列の計算2
+
+    Args:
+        spec (ndarray): 入力信号(channel x #frame x frequency_bin)
+        win_size (int):   窓幅
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x channel x channel)
+        - 複数フレームを用いてブロックを構成する(構成時のパラメータがwin_size, step)
+
+    """
+
     # ch,frame,spec -> frame,spec,ch
     n_ch = spec.shape[0]
     n_frame = spec.shape[1]
@@ -108,12 +135,33 @@ f1 = interpolate.interp1d(f, w, kind="cubic")
 
 
 def A_characteristic(freq):
+    """ A特性の計算
+    
+    予め用意したテーブルからA特性を計算して返す
+    
+    """
     return f1(freq)
 
 
 def compute_music_spec(
     spec, src_num, tf_config, df, min_freq_bin=0, win_size=50, step=50
 ):
+    """ 空間パワー（MUSIC spectrum）の計算
+
+    Args:
+        spec (ndarray): 入力信号(channel x #frame x frequency_bin)
+        src_num (int): 想定音源数
+        tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
+        df: 周波数ビンあたりの周波数： フーリエ変換字のパラメータから計算される
+        min_freq_bin (int): 計算に使う最小周波数ビン（ノイズの多い低周波を無視するため）
+        win_size (int):   窓幅
+        step (int):  シフト幅
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x k)
+        - k: 方向のインデックス
+
+    """
     corr = estimate_spatial_correlation2(spec, win_size, step)
     power = np.zeros(
         (corr.shape[0], corr.shape[1], len(tf_config["tf"])), dtype=complex
@@ -204,6 +252,29 @@ def compute_music_power(
     music_win_size,
     music_step,
 ):
+    """ wavファイルからの空間パワー（MUSIC spectrum）の計算
+
+    Args:
+        wav_filename (str): 入力wavファイル名
+        tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
+        normalize_factor: 入力波形/ normalize_factor　として入力波形の調整をする
+        src_num (int): 想定音源数(MUSIC法パラメータ)
+        min_freq (int): 計算に使う最小周波数（ノイズの多い低周波を無視するため）
+        max_freq (int): 計算に使う最大周波数（ノイズの多い高周波を無視するため）
+        fftLen (int):   窓幅
+        stft_step (int):  シフト幅
+        music_win_size (int):   窓幅
+        music_step (int):  シフト幅
+        
+
+    Returns:
+        ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x k)
+        - spec: stftの結果
+        - m_power: 空間パワー 周波数について平均化した結果 (#block x k)
+        - m_full_power: 空間パワー (#block x frequency_bin x k)
+        - setting: 各種セッティング
+
+    """
     setting = {}
     # read wav
     print("... reading", wav_filename)

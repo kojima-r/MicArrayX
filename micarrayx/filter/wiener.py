@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+""" command: micarrayx-filter-wiener
+"""
 import sys
 import numpy as np
 import numpy.random as npr

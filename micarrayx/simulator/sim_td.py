@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+""" command: micarrayx-sim-td
+"""
 from hark_tf.read_param import read_hark_tf_param
 import sys
 import wave

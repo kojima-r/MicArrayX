@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+""" command: micarrayx-mix
+"""
 import wave
 import array
 import sys
