@@ -9,27 +9,6 @@ import math
 # matplotlib.use('tkagg')
 from matplotlib import pylab as plt
 
-
-def estimate_spatial_correlation2(spec, win_size, step):
-    # ch,frame,spec -> frame,spec,ch
-    n_ch = spec.shape[0]
-    n_frame = spec.shape[1]
-    n_bin = spec.shape[2]
-    corr = np.zeros((n_frame, n_bin, n_ch, n_ch), dtype=complex)
-
-    # out_corr: frame,spec,ch1,ch2
-    for i in range(n_ch):
-        for j in range(n_ch):
-            corr[:, :, i, j] = spec[i] * spec[j].conj()
-    now_frame = 0
-    out = []
-    while now_frame + win_size <= n_frame:
-        o = np.mean(corr[now_frame : now_frame + win_size], axis=0)
-        out.append(o)
-        now_frame += step
-    return np.array(out)
-
-
 def estimate_correlation_r(spec1, spec2, win_size, step):
     # ch,frame,spec -> frame,spec,ch
     n_ch1 = spec1.shape[0]

@@ -28,6 +28,17 @@ def get_blocking_mat(n):
     return x
 
 def beamforming_ds(tf_config, spec, n_theta=18):
+    """ Delay-sum beamforming
+    Args:
+        tf_config (Dict): HARK_TF_PARSERで取得できる関数
+        spec (ndarray): 入力信号(channel x #frame x frequency_bin)
+        n_theta (int): 角度の分割数
+
+    Returns:
+        ndarray: 出力信号(方向分割数(n_theta) x #frame x frequency_bin)
+
+
+    """
     nch = spec.shape[0]
     nframe = spec.shape[1]
     nfreq_bin = spec.shape[2]

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+"""パーセバルの等式をチェックするためのスクリプト（デバッグ用）
+"""
 from scipy import ceil, complex64, float64, hamming, zeros
 from scipy.fftpack import fft  # , ifft
 from scipy import ifft  # こっちじゃないとエラー出るときあった気がする
@@ -12,24 +14,10 @@ import numpy.random as npr
 import math
 
 import micarrayx
+from micarrayx.util import apply_window
+
 from hark_tf.read_mat import read_hark_tf
 from hark_tf.read_param import read_hark_tf_param
-
-
-def apply_window(x, win, step):
-    l = len(x)
-    N = len(win)
-    M = int(ceil(float(l - N + step) / step))
-
-    new_x = zeros(int(N + ((M - 1) * step)), dtype=float64)
-    new_x[:l] = x  # zero padding
-
-    X = zeros([M, N], dtype=float64)
-    for m in range(M):
-        start = int(step * m)
-        X[m, :] = new_x[start : start + N] * win
-    return X
-
 
 if __name__ == "__main__":
     # argv check
