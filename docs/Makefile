@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 BINBUILD   = pdoc
 PROJ     = ../micarrayx
-BUILDDIR      = _build
+BUILDDIR      = .
 
 .phony: makefile
 
