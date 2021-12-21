@@ -11,7 +11,7 @@ import numpy as np
 import numpy.random as npr
 import math
 from optparse import OptionParser
-import simmch
+import micarrayx
 
 
 def zcc(x):
@@ -108,7 +108,7 @@ def main():
     data = []
     print("... reading .wav files")
     wav_filename = args[0]
-    wav_data = simmch.read_mch_wave(wav_filename)
+    wav_data = micarrayx.read_mch_wave(wav_filename)
     wav = wav_data["wav"]
     fs = wav_data["framerate"]
     nch = wav_data["nchannels"]
@@ -121,7 +121,7 @@ def main():
     if ch >= nch:
         print("[ERROR] target channel (%d) does not exist" % ch, file=sys.stderr)
         quit()
-    x = simmch.apply_window(wav[ch], win, step)
+    x = micarrayx.apply_window(wav[ch], win, step)
     nframe = x.shape[0]
     x_power = [np.mean(x[m, :] ** 2) for m in range(nframe)]
     x_amp = [np.max(abs(x[m, :])) for m in range(nframe)]
@@ -162,7 +162,7 @@ def main():
         if options.output_file != None:
             o = options.output_file % seg_id
             print("[save]", o)
-            simmch.save_mch_wave(w, o)
+            micarrayx.save_mch_wave(w, o)
     #
     plt.subplot(4, 1, 1)
     disable_xy_label = False

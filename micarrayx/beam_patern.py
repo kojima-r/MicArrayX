@@ -10,8 +10,8 @@ import math
 
 from hark_tf.read_mat import read_hark_tf
 from hark_tf.read_param import read_hark_tf_param
-import simmch
-from sim_tf import apply_tf
+import micarrayx
+from micarrayx.simulator.sim_tf import apply_tf
 
 from optparse import OptionParser
 
@@ -79,7 +79,7 @@ def main():
     tf_config = read_hark_tf(tf_filename)
     target_ch = options.channel
     src_theta = options.direction / 180.0 * math.pi
-    src_index = simmch.nearest_direction_index(tf_config, src_theta)
+    src_index = micarrayx.nearest_direction_index(tf_config, src_theta)
     src_volume = options.volume
     # output_filename=args[1]
     if not src_index in tf_config["tf"]:
@@ -90,7 +90,7 @@ def main():
     mic_pos = read_hark_tf_param(tf_filename)
     print("# mic positions:", mic_pos)
     wav_filename = args[0]
-    wav_data = simmch.read_mch_wave(wav_filename)
+    wav_data = micarrayx.read_mch_wave(wav_filename)
     wav = wav_data["wav"] / 32767.0
     fs = wav_data["framerate"]
     nch = wav_data["nchannels"]

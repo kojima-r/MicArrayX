@@ -21,10 +21,8 @@ import json
 
 import micarrayx
 from hark_tf import read_hark_tf
-from hark_tf import read_hark_tf_param
-from hark_tf import permutation_hark_tf
-
-from micarryx import music
+from hark_tf.read_param import read_hark_tf_param
+from hark_tf.sorting_mat import permutation_hark_tf
 
 from optparse import OptionParser
 

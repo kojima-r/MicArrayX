@@ -25,6 +25,30 @@ def rand_noise(x):
 
 
 def make_white_noise_freq(nch, length, fftLen, step):
+    """白色ノイズの作成（周波数領域）
+
+        関数についての説明文
+
+        Args:
+            nch (int):    チャンネル数
+            length (int): STFTパラメータ：サンプル数
+            fftLen (int): STFTパラメータ：FFTの長さ
+            step (int):   STFTパラメータ：
+
+        Returns:
+            ndarray: ホワイトノイズの結果
+
+        Examples:
+
+            >>> nsamples=16000
+            >>> fftLen=512
+            >>> step=256
+            >>> length = ((nsamples - (fftLen - step)) - 1) / step + 1
+            >>> wav_freq=make_white_noise(nch=1, length=length, fftLen=fftLen, step=step)
+            >>> wav_freq.shape
+
+
+    """
     # stft length <-> samples
     src_volume = 1
     data = np.zeros((nch, int(length), fftLen // 2 + 1), dtype=complex64)

@@ -8,10 +8,12 @@ import numpy as np
 import numpy.random as npr
 import math
 
-from HARK_TF_Parser.read_mat import read_hark_tf
-from HARK_TF_Parser.read_param import read_hark_tf_param
-from .sim_tf import apply_tf
-from .simmch import nearest_direction_index
+import micarrayx
+from hark_tf.read_mat import read_hark_tf
+from hark_tf.read_param import read_hark_tf_param
+from micarrayx.simulator.sim_tf import apply_tf
+from micarrayx import nearest_direction_index
+
 
 from optparse import OptionParser
 

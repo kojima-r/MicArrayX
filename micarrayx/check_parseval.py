@@ -11,7 +11,7 @@ import numpy as np
 import numpy.random as npr
 import math
 
-import simmch
+import micarrayx
 from hark_tf.read_mat import read_hark_tf
 from hark_tf.read_param import read_hark_tf_param
 
@@ -70,12 +70,12 @@ if __name__ == "__main__":
     win = hamming(fftLen)
     # win =[1.0]*fftLen
     ### STFT
-    spectrogram = simmch.stft(data, win, step)
+    spectrogram = micarrayx.stft(data, win, step)
     w_data = apply_window(data, win, step)
     w_sum = np.sum(w_data ** 2, axis=1)
 
     spec = spectrogram[:, : fftLen // 2 + 1]
-    full_spec = simmch.make_full_spectrogram(spec)
+    full_spec = micarrayx.make_full_spectrogram(spec)
     s_sum = np.mean((np.abs(spectrogram) ** 2), axis=1)
 
     print("wav power:", w_sum)

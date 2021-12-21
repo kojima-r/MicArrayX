@@ -7,7 +7,7 @@ import numpy as np
 import numpy.random as npr
 import math
 from optparse import OptionParser
-import simmch
+import micarrayx
 
 def main():
     usage = "usage: %s tf [options] <in: src.wav>" % sys.argv[0]
@@ -45,7 +45,7 @@ def main():
     #
     wav_filename = args[0]
     print("... reading", wav_filename)
-    wav_data = simmch.read_mch_wave(wav_filename)
+    wav_data = micarrayx.read_mch_wave(wav_filename)
     wav = wav_data["wav"]
     fs = wav_data["framerate"]
     nch = wav_data["nchannels"]
@@ -56,7 +56,7 @@ def main():
     wav = wav * g
     # save data
     if output_filename != None:
-        simmch.save_mch_wave(wav, output_filename)
+        micarrayx.save_mch_wave(wav, output_filename)
 
 if __name__ == "__main__":
     main()
