@@ -37,8 +37,10 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
-        run: python3 -m pip install pdoc3
-        #run: python3 -m pip install -r ./requirements.txt
+        run: python3 -m pip install git+https://github.com/kojima-r/HARK_TF_Parser.git
+
+      - name: Install dependencies
+        run: python3 -m pip install -r ./requirements.txt
 
       - run: cd docs && make
 
