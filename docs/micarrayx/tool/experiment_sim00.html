@@ -685,7 +685,8 @@ if __name__ == &#34;__main__&#34;:
     win = np.hamming(fftLen)  # ハミング窓
     step= args.stft_step
     recons_ds = micarrayx.istft_mch(ds_freq, win, step)
-    micarrayx.save_mch_wave(recons_ds * 32767.0, args.out_recons)</code></pre>
+    micarrayx.save_mch_wave(recons_ds * 32767.0, args.out_recons)
+    #</code></pre>
 </details>
 </dd>
 </dl>
