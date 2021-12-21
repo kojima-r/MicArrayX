@@ -57,6 +57,17 @@ def get_blocking_mat(n):
     return x
 
 def beamforming_ds(tf_config, spec, n_theta=18):
+    &#34;&#34;&#34; Delay-sum beamforming
+    Args:
+        tf_config (Dict): HARK_TF_PARSERで取得できる関数
+        spec (ndarray): 入力信号(channel x #frame x frequency_bin)
+        n_theta (int): 角度の分割数
+
+    Returns:
+        ndarray: 出力信号(方向分割数(n_theta) x #frame x frequency_bin)
+
+
+    &#34;&#34;&#34;
     nch = spec.shape[0]
     nframe = spec.shape[1]
     nfreq_bin = spec.shape[2]
@@ -225,12 +236,37 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">beamforming_ds</span></span>(<span>tf_config, spec, n_theta=18)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Delay-sum beamforming</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tf_config</code></strong> :&ensp;<code>Dict</code></dt>
+<dd>HARK_TF_PARSERで取得できる関数</dd>
+<dt><strong><code>spec</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>入力信号(channel x #frame x frequency_bin)</dd>
+<dt><strong><code>n_theta</code></strong> :&ensp;<code>int</code></dt>
+<dd>角度の分割数</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>出力信号(方向分割数(n_theta) x #frame x frequency_bin)</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def beamforming_ds(tf_config, spec, n_theta=18):
+    &#34;&#34;&#34; Delay-sum beamforming
+    Args:
+        tf_config (Dict): HARK_TF_PARSERで取得できる関数
+        spec (ndarray): 入力信号(channel x #frame x frequency_bin)
+        n_theta (int): 角度の分割数
+
+    Returns:
+        ndarray: 出力信号(方向分割数(n_theta) x #frame x frequency_bin)
+
+
+    &#34;&#34;&#34;
     nch = spec.shape[0]
     nframe = spec.shape[1]
     nfreq_bin = spec.shape[2]

@@ -37,27 +37,6 @@ import math
 # matplotlib.use(&#39;tkagg&#39;)
 from matplotlib import pylab as plt
 
-
-def estimate_spatial_correlation2(spec, win_size, step):
-    # ch,frame,spec -&gt; frame,spec,ch
-    n_ch = spec.shape[0]
-    n_frame = spec.shape[1]
-    n_bin = spec.shape[2]
-    corr = np.zeros((n_frame, n_bin, n_ch, n_ch), dtype=complex)
-
-    # out_corr: frame,spec,ch1,ch2
-    for i in range(n_ch):
-        for j in range(n_ch):
-            corr[:, :, i, j] = spec[i] * spec[j].conj()
-    now_frame = 0
-    out = []
-    while now_frame + win_size &lt;= n_frame:
-        o = np.mean(corr[now_frame : now_frame + win_size], axis=0)
-        out.append(o)
-        now_frame += step
-    return np.array(out)
-
-
 def estimate_correlation_r(spec1, spec2, win_size, step):
     # ch,frame,spec -&gt; frame,spec,ch
     n_ch1 = spec1.shape[0]
@@ -315,35 +294,6 @@ def save_sidelobe(filename, tf_config, w, sf_bin, clear_flag=True):
     return corr</code></pre>
 </details>
 </dd>
-<dt id="micarrayx.filter.filter_aux.estimate_spatial_correlation2"><code class="name flex">
-<span>def <span class="ident">estimate_spatial_correlation2</span></span>(<span>spec, win_size, step)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def estimate_spatial_correlation2(spec, win_size, step):
-    # ch,frame,spec -&gt; frame,spec,ch
-    n_ch = spec.shape[0]
-    n_frame = spec.shape[1]
-    n_bin = spec.shape[2]
-    corr = np.zeros((n_frame, n_bin, n_ch, n_ch), dtype=complex)
-
-    # out_corr: frame,spec,ch1,ch2
-    for i in range(n_ch):
-        for j in range(n_ch):
-            corr[:, :, i, j] = spec[i] * spec[j].conj()
-    now_frame = 0
-    out = []
-    while now_frame + win_size &lt;= n_frame:
-        o = np.mean(corr[now_frame : now_frame + win_size], axis=0)
-        out.append(o)
-        now_frame += step
-    return np.array(out)</code></pre>
-</details>
-</dd>
 <dt id="micarrayx.filter.filter_aux.get_all_sidelobe"><code class="name flex">
 <span>def <span class="ident">get_all_sidelobe</span></span>(<span>tf_config, w)</span>
 </code></dt>
@@ -465,7 +415,6 @@ def save_sidelobe(filename, tf_config, w, sf_bin, clear_flag=True):
 <li><code><a title="micarrayx.filter.filter_aux.estimate_correlation" href="#micarrayx.filter.filter_aux.estimate_correlation">estimate_correlation</a></code></li>
 <li><code><a title="micarrayx.filter.filter_aux.estimate_correlation_r" href="#micarrayx.filter.filter_aux.estimate_correlation_r">estimate_correlation_r</a></code></li>
 <li><code><a title="micarrayx.filter.filter_aux.estimate_self_correlation" href="#micarrayx.filter.filter_aux.estimate_self_correlation">estimate_self_correlation</a></code></li>
-<li><code><a title="micarrayx.filter.filter_aux.estimate_spatial_correlation2" href="#micarrayx.filter.filter_aux.estimate_spatial_correlation2">estimate_spatial_correlation2</a></code></li>
 <li><code><a title="micarrayx.filter.filter_aux.get_all_sidelobe" href="#micarrayx.filter.filter_aux.get_all_sidelobe">get_all_sidelobe</a></code></li>
 <li><code><a title="micarrayx.filter.filter_aux.get_beam_mat" href="#micarrayx.filter.filter_aux.get_beam_mat">get_beam_mat</a></code></li>
 <li><code><a title="micarrayx.filter.filter_aux.get_beam_vec" href="#micarrayx.filter.filter_aux.get_beam_vec">get_beam_vec</a></code></li>

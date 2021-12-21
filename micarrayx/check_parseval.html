@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>micarrayx.check_parseval API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="パーセバルの等式をチェックするためのスクリプト（デバッグ用）" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,11 +22,14 @@
 <h1 class="title">Module <code>micarrayx.check_parseval</code></h1>
 </header>
 <section id="section-intro">
+<p>パーセバルの等式をチェックするためのスクリプト（デバッグ用）</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
+&#34;&#34;&#34;パーセバルの等式をチェックするためのスクリプト（デバッグ用）
+&#34;&#34;&#34;
 from scipy import ceil, complex64, float64, hamming, zeros
 from scipy.fftpack import fft  # , ifft
 from scipy import ifft  # こっちじゃないとエラー出るときあった気がする
@@ -40,24 +43,10 @@ import numpy.random as npr
 import math
 
 import micarrayx
+from micarrayx.util import apply_window
+
 from hark_tf.read_mat import read_hark_tf
 from hark_tf.read_param import read_hark_tf_param
-
-
-def apply_window(x, win, step):
-    l = len(x)
-    N = len(win)
-    M = int(ceil(float(l - N + step) / step))
-
-    new_x = zeros(int(N + ((M - 1) * step)), dtype=float64)
-    new_x[:l] = x  # zero padding
-
-    X = zeros([M, N], dtype=float64)
-    for m in range(M):
-        start = int(step * m)
-        X[m, :] = new_x[start : start + N] * win
-    return X
-
 
 if __name__ == &#34;__main__&#34;:
     # argv check
@@ -127,33 +116,6 @@ if __name__ == &#34;__main__&#34;:
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-functions">Functions</h2>
-<dl>
-<dt id="micarrayx.check_parseval.apply_window"><code class="name flex">
-<span>def <span class="ident">apply_window</span></span>(<span>x, win, step)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def apply_window(x, win, step):
-    l = len(x)
-    N = len(win)
-    M = int(ceil(float(l - N + step) / step))
-
-    new_x = zeros(int(N + ((M - 1) * step)), dtype=float64)
-    new_x[:l] = x  # zero padding
-
-    X = zeros([M, N], dtype=float64)
-    for m in range(M):
-        start = int(step * m)
-        X[m, :] = new_x[start : start + N] * win
-    return X</code></pre>
-</details>
-</dd>
-</dl>
 </section>
 <section>
 </section>
@@ -167,11 +129,6 @@ if __name__ == &#34;__main__&#34;:
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="micarrayx" href="index.html">micarrayx</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
-<li><code><a title="micarrayx.check_parseval.apply_window" href="#micarrayx.check_parseval.apply_window">apply_window</a></code></li>
 </ul>
 </li>
 </ul>
