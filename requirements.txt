@@ -25,7 +25,7 @@ python-dateutil
 pytz==2021.3
 scipy
 seaborn
-sip==4.19.13
+sip
 six
 tornado
 zipp==3.6.0
