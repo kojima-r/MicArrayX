@@ -57,10 +57,10 @@ def make_noise(x):
 
 
 def apply_tf_spec(data, fftLen, step, tf_config, src_index, noise_amp=0):
-    &#34;&#34;&#34; 伝達関数の適用
+    &#34;&#34;&#34; 入力波形に対して、周波数領域での伝達関数の適用を行い、スペクトログラム形式のまま出力する
 
     Args:
-        data (ndarray): 周波数スペクトログラム(channel x #sample x frequency_bin)
+        data (ndarray): 単チャンネル信号(#sample)
         fftLen (int):   窓関数
         step (int):  シフト幅
         tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
@@ -68,7 +68,7 @@ def apply_tf_spec(data, fftLen, step, tf_config, src_index, noise_amp=0):
         noise_amp (float):  ノイズの大きさ
 
     Returns:
-        ndarray: 伝達関数適用後のスペクトログラム(channel x #sample x frequency_bin)
+        ndarray: 伝達関数適用後のスペクトログラム(channel x #frame x frequency_bin)
 
     &#34;&#34;&#34;
 
@@ -101,10 +101,10 @@ def apply_tf_spec(data, fftLen, step, tf_config, src_index, noise_amp=0):
 
 
 def apply_tf(data, fftLen, step, tf_config, src_index, noise_amp=0):
-    &#34;&#34;&#34; 伝達関数の適用
+    &#34;&#34;&#34; 入力波形に対して、周波数領域での伝達関数の適用を行い、逆変換を行い、多チャンネル波形の形式で出力する
 
     Args:
-        data (ndarray): 周波数スペクトログラム(channel x #sample x frequency_bin)
+        data (ndarray): 単チャンネル信号(#sample)
         fftLen (int):   窓関数
         step (int):  シフト幅
         tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
@@ -199,11 +199,11 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">apply_tf</span></span>(<span>data, fftLen, step, tf_config, src_index, noise_amp=0)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>伝達関数の適用</p>
+<div class="desc"><p>入力波形に対して、周波数領域での伝達関数の適用を行い、逆変換を行い、多チャンネル波形の形式で出力する</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>data</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>周波数スペクトログラム(channel x #sample x frequency_bin)</dd>
+<dd>単チャンネル信号(#sample)</dd>
 <dt><strong><code>fftLen</code></strong> :&ensp;<code>int</code></dt>
 <dd>窓関数</dd>
 <dt><strong><code>step</code></strong> :&ensp;<code>int</code></dt>
@@ -225,10 +225,10 @@ if __name__ == &#34;__main__&#34;:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def apply_tf(data, fftLen, step, tf_config, src_index, noise_amp=0):
-    &#34;&#34;&#34; 伝達関数の適用
+    &#34;&#34;&#34; 入力波形に対して、周波数領域での伝達関数の適用を行い、逆変換を行い、多チャンネル波形の形式で出力する
 
     Args:
-        data (ndarray): 周波数スペクトログラム(channel x #sample x frequency_bin)
+        data (ndarray): 単チャンネル信号(#sample)
         fftLen (int):   窓関数
         step (int):  シフト幅
         tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
@@ -258,11 +258,11 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">apply_tf_spec</span></span>(<span>data, fftLen, step, tf_config, src_index, noise_amp=0)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>伝達関数の適用</p>
+<div class="desc"><p>入力波形に対して、周波数領域での伝達関数の適用を行い、スペクトログラム形式のまま出力する</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>data</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>周波数スペクトログラム(channel x #sample x frequency_bin)</dd>
+<dd>単チャンネル信号(#sample)</dd>
 <dt><strong><code>fftLen</code></strong> :&ensp;<code>int</code></dt>
 <dd>窓関数</dd>
 <dt><strong><code>step</code></strong> :&ensp;<code>int</code></dt>
@@ -277,17 +277,17 @@ if __name__ == &#34;__main__&#34;:
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>ndarray</code></dt>
-<dd>伝達関数適用後のスペクトログラム(channel x #sample x frequency_bin)</dd>
+<dd>伝達関数適用後のスペクトログラム(channel x #frame x frequency_bin)</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def apply_tf_spec(data, fftLen, step, tf_config, src_index, noise_amp=0):
-    &#34;&#34;&#34; 伝達関数の適用
+    &#34;&#34;&#34; 入力波形に対して、周波数領域での伝達関数の適用を行い、スペクトログラム形式のまま出力する
 
     Args:
-        data (ndarray): 周波数スペクトログラム(channel x #sample x frequency_bin)
+        data (ndarray): 単チャンネル信号(#sample)
         fftLen (int):   窓関数
         step (int):  シフト幅
         tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
@@ -295,7 +295,7 @@ if __name__ == &#34;__main__&#34;:
         noise_amp (float):  ノイズの大きさ
 
     Returns:
-        ndarray: 伝達関数適用後のスペクトログラム(channel x #sample x frequency_bin)
+        ndarray: 伝達関数適用後のスペクトログラム(channel x #frame x frequency_bin)
 
     &#34;&#34;&#34;
 
