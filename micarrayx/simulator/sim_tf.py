@@ -28,10 +28,10 @@ def make_noise(x):
 
 
 def apply_tf_spec(data, fftLen, step, tf_config, src_index, noise_amp=0):
-    """ 伝達関数の適用
+    """ 入力波形に対して、周波数領域での伝達関数の適用を行い、スペクトログラム形式のまま出力する
 
     Args:
-        data (ndarray): 周波数スペクトログラム(channel x #sample x frequency_bin)
+        data (ndarray): 単チャンネル信号(#sample)
         fftLen (int):   窓関数
         step (int):  シフト幅
         tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
@@ -39,7 +39,7 @@ def apply_tf_spec(data, fftLen, step, tf_config, src_index, noise_amp=0):
         noise_amp (float):  ノイズの大きさ
 
     Returns:
-        ndarray: 伝達関数適用後のスペクトログラム(channel x #sample x frequency_bin)
+        ndarray: 伝達関数適用後のスペクトログラム(channel x #frame x frequency_bin)
 
     """
 
@@ -72,10 +72,10 @@ def apply_tf_spec(data, fftLen, step, tf_config, src_index, noise_amp=0):
 
 
 def apply_tf(data, fftLen, step, tf_config, src_index, noise_amp=0):
-    """ 伝達関数の適用
+    """ 入力波形に対して、周波数領域での伝達関数の適用を行い、逆変換を行い、多チャンネル波形の形式で出力する
 
     Args:
-        data (ndarray): 周波数スペクトログラム(channel x #sample x frequency_bin)
+        data (ndarray): 単チャンネル信号(#sample)
         fftLen (int):   窓関数
         step (int):  シフト幅
         tf_config (Dict): HARK_TF_PARSERで取得できる伝達関数
