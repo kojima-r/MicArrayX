@@ -144,7 +144,7 @@ def A_characteristic(freq):
 
 
 def compute_music_spec(
-    spec, src_num, tf_config, df, min_freq_bin=0, win_size=50, step=50
+    spec, src_num, tf_config, df, min_freq_bin=0, win_size=50, step=50, weight_type="uniform"
 ):
     """ 空間パワー（MUSIC spectrum）の計算
 
@@ -156,6 +156,7 @@ def compute_music_spec(
         min_freq_bin (int): 計算に使う最小周波数ビン（ノイズの多い低周波を無視するため）
         win_size (int):   窓幅
         step (int):  シフト幅
+        weight_type (str): 周波数ビンの重みのタイプ("uniform": 一様, "A":A特性)
 
     Returns:
         ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x k)
@@ -170,20 +171,22 @@ def compute_music_spec(
         # normalize correlation
         rxx = corr[frame, freq]
         r = rxx / np.max(np.absolute(rxx)+1.0e-20)
-        #
-        # e_val,e_vec = np.linalg.eigh(corr[frame,freq])
-        e_val, e_vec = linalg.eig(r)
+        # eigen value decomposition
+        e_val, e_vec = np.linalg.eig(r)
         # sort
         eigen_id = np.argsort(e_val)[::-1]
         e_val = e_val[eigen_id]
         e_vec = e_vec[:, eigen_id]
         e = e_vec[:, src_num:]
+        # frequency weight
+        if weight_type=="A":
+            weight = A_characteristic((min_freq_bin + freq) * df)
+        else: # uniform
+            weight = 1.0/corr.shape[1]
         # directions
         for k, v in list(tf_config["tf"].items()):
             a_vec = v["mat"][:, min_freq_bin + freq]
             a_vec = a_vec / np.absolute(a_vec)
-            weight = A_characteristic((min_freq_bin + freq) * df)
-            # power[frame,freq,k]=weight*np.dot(a_vec.conj(),a_vec)/np.dot(np.dot(a_vec.conj(),ee),a_vec)
             s = np.dot(a_vec.conj(), e)
             power[frame, freq, k] = (
                 weight * np.dot(a_vec.conj(), a_vec) / np.dot(s, s.conj())

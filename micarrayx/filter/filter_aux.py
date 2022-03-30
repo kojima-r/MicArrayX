@@ -1,3 +1,5 @@
+"""　フィルタ処理に関連した関数群
+"""
 import sys
 import numpy as np
 import numpy.random as npr
