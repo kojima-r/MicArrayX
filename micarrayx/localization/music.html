@@ -191,7 +191,7 @@ def compute_music_spec(
         - k: 方向のインデックス
 
     &#34;&#34;&#34;
-    corr = estimate_spatial_correlation2(spec, win_size, step)
+    corr = estimate_spatial_correlation(spec, win_size, step)
     power = np.zeros(
         (corr.shape[0], corr.shape[1], len(tf_config[&#34;tf&#34;])), dtype=complex
     )
@@ -755,7 +755,7 @@ if __name__ == &#34;__main__&#34;:
         - k: 方向のインデックス
 
     &#34;&#34;&#34;
-    corr = estimate_spatial_correlation2(spec, win_size, step)
+    corr = estimate_spatial_correlation(spec, win_size, step)
     power = np.zeros(
         (corr.shape[0], corr.shape[1], len(tf_config[&#34;tf&#34;])), dtype=complex
     )
