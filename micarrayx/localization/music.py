@@ -254,6 +254,7 @@ def compute_music_power(
     src_num,
     music_win_size,
     music_step,
+    weight_type="uniform",
 ):
     """ wavファイルからの空間パワー（MUSIC spectrum）の計算
 
@@ -268,7 +269,7 @@ def compute_music_power(
         stft_step (int):  シフト幅
         music_win_size (int):   窓幅
         music_step (int):  シフト幅
-        
+        weight_type (str): 周波数ビンの重みのタイプ("uniform": 一様, "A":A特性)
 
     Returns:
         ndarray: STFTの結果：スペクトログラム(#block x frequency_bin x k)
@@ -326,6 +327,7 @@ def compute_music_power(
         min_freq_bin,
         win_size=music_win_size,
         step=music_step,
+        weight_type=weight_type,
     )
     p = np.sum(np.real(power), axis=1)
     m_power = 10 * np.log10(p + 1.0)
@@ -395,6 +397,12 @@ def main():
         type=int,
         default=50,
         help="advanced step block size (i.e. frequency of computing MUSIC spectrum) (frame)",
+    )
+    parser.add_argument(
+        "--music_weight_type",
+        choices=["uniform","A"],
+        default="uniform",
+        help="weight of bins of frequencies",
     )
     parser.add_argument(
         "--music_src_num",
