@@ -65,7 +65,7 @@ def slice_window(x, win_size, step):
 
 
 def estimate_spatial_correlation(spec, win_size, step):
-    &#34;&#34;&#34; 空間相関行列の計算
+    &#34;&#34;&#34; 空間相関行列の計算 (einsumを使った実装)
 
     Args:
         spec (ndarray): 入力信号(channel x #frame x frequency_bin)
@@ -83,7 +83,6 @@ def estimate_spatial_correlation(spec, win_size, step):
     data = slice_window(x, win_size, step)
     a = np.transpose(data, (0, 2, 3, 1))
     b = np.transpose(data, (0, 2, 1, 3)).conj()
-    print(data.shape)
     c = np.einsum(&#34;ijkl,ijlm-&gt;ijkm&#34;, a, b)
     # out_corr: frame,spec,ch1,ch2
     out_corr = c * 1.0 / win_size
@@ -92,7 +91,7 @@ def estimate_spatial_correlation(spec, win_size, step):
 
 
 def estimate_spatial_correlation2(spec, win_size, step):
-    &#34;&#34;&#34; 空間相関行列の計算2
+    &#34;&#34;&#34; 空間相関行列の計算2 (ループを使った実装)
 
     Args:
         spec (ndarray): 入力信号(channel x #frame x frequency_bin)
@@ -791,7 +790,7 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">estimate_spatial_correlation</span></span>(<span>spec, win_size, step)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>空間相関行列の計算</p>
+<div class="desc"><p>空間相関行列の計算 (einsumを使った実装)</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>spec</code></strong> :&ensp;<code>ndarray</code></dt>
@@ -814,7 +813,7 @@ if __name__ == &#34;__main__&#34;:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def estimate_spatial_correlation(spec, win_size, step):
-    &#34;&#34;&#34; 空間相関行列の計算
+    &#34;&#34;&#34; 空間相関行列の計算 (einsumを使った実装)
 
     Args:
         spec (ndarray): 入力信号(channel x #frame x frequency_bin)
@@ -832,7 +831,6 @@ if __name__ == &#34;__main__&#34;:
     data = slice_window(x, win_size, step)
     a = np.transpose(data, (0, 2, 3, 1))
     b = np.transpose(data, (0, 2, 1, 3)).conj()
-    print(data.shape)
     c = np.einsum(&#34;ijkl,ijlm-&gt;ijkm&#34;, a, b)
     # out_corr: frame,spec,ch1,ch2
     out_corr = c * 1.0 / win_size
@@ -844,7 +842,7 @@ if __name__ == &#34;__main__&#34;:
 <span>def <span class="ident">estimate_spatial_correlation2</span></span>(<span>spec, win_size, step)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>空間相関行列の計算2</p>
+<div class="desc"><p>空間相関行列の計算2 (ループを使った実装)</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>spec</code></strong> :&ensp;<code>ndarray</code></dt>
@@ -867,7 +865,7 @@ if __name__ == &#34;__main__&#34;:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def estimate_spatial_correlation2(spec, win_size, step):
-    &#34;&#34;&#34; 空間相関行列の計算2
+    &#34;&#34;&#34; 空間相関行列の計算2 (ループを使った実装)
 
     Args:
         spec (ndarray): 入力信号(channel x #frame x frequency_bin)
