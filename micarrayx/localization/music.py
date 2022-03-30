@@ -36,7 +36,7 @@ def slice_window(x, win_size, step):
 
 
 def estimate_spatial_correlation(spec, win_size, step):
-    """ 空間相関行列の計算
+    """ 空間相関行列の計算 (einsumを使った実装)
 
     Args:
         spec (ndarray): 入力信号(channel x #frame x frequency_bin)
@@ -54,7 +54,6 @@ def estimate_spatial_correlation(spec, win_size, step):
     data = slice_window(x, win_size, step)
     a = np.transpose(data, (0, 2, 3, 1))
     b = np.transpose(data, (0, 2, 1, 3)).conj()
-    print(data.shape)
     c = np.einsum("ijkl,ijlm->ijkm", a, b)
     # out_corr: frame,spec,ch1,ch2
     out_corr = c * 1.0 / win_size
@@ -63,7 +62,7 @@ def estimate_spatial_correlation(spec, win_size, step):
 
 
 def estimate_spatial_correlation2(spec, win_size, step):
-    """ 空間相関行列の計算2
+    """ 空間相関行列の計算2 (ループを使った実装)
 
     Args:
         spec (ndarray): 入力信号(channel x #frame x frequency_bin)
