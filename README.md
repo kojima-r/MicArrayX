@@ -13,7 +13,9 @@ pip install git+https://github.com/kojima-r/MicArrayX.git
 ```
 # Tutorial
 
-MicArrayX_tutorial.ipynb: https://colab.research.google.com/drive/1pscHRoQxtvA_u9eq72cDCZGZcAMp6CwI?usp=sharing
+MicArrayX_tutorial.ipynb: https://drive.google.com/file/d/1JOuaxaddUbI7m9Tjm_LaFdjWkQL4Kf4o/view?usp=sharing
+
+
 
 Python API: [Documentation](https://kojima-r.github.io/MicArrayX/micarrayx/index.html)
 
